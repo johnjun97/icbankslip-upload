@@ -1,121 +1,226 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import logo from './assets/logo.png'
 import './App.css'
+import { useState } from 'react'
+import { supabase } from './lib/supabase'
+import { QRCodeCanvas } from 'qrcode.react'
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const [qrCode, setQrCode] = useState(null)
+
+  const [files, setFiles] = useState({
+    icFront: null,
+    icBack: null,
+    bankSlip: null
+  })
+
+  const handleFileChange = (e, fileName) => {
+    const file = e.target.files[0]
+
+    if (file) {
+      setFiles({
+        ...files,
+        [fileName]: {
+          file: file,
+          preview: URL.createObjectURL(file)
+        }
+      })
+    }
+  }
+
+  const uploadFile = async (file, folder) => {
+    if (!file) return null
+
+    const fileName = `${Date.now()}-${file.name}`
+
+    const { data, error } = await supabase.storage
+      .from('uploads')
+      .upload(`${folder}/${fileName}`, file)
+
+    if (error) {
+      console.error('Upload error:', error)
+      return null
+    }
+
+    return data.path
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    const icFrontPath = await uploadFile(
+      files.icFront?.file,
+      "ic-front"
+    )
+
+    const icBackPath = await uploadFile(
+      files.icBack?.file,
+      "ic-back"
+    )
+
+    const bankSlipPath = await uploadFile(
+      files.bankSlip?.file,
+      "bank-slip"
+    )
+
+    const qrValue = `NIR-${Date.now()}`
+
+    const { data: testData, error: testError } = await supabase
+      .from('submissions')
+      .select('*')
+      .limit(1)
+
+    console.log("select test:", testData, testError)
+
+    const { data, error } = await supabase
+      .from('submissions')
+      .insert({
+        status: 'Pending',
+        qrcode: qrValue
+      })
+      .single()
+
+    if (error) {
+      console.error(error)
+    } else {
+      console.log('Saved:', data)
+
+      setQrCode(qrValue)
+    }
+
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+    <div className="app">
+      <div className="form-container">
+        <img src={logo} alt="Logo" />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <p>Fill in the above information.</p>
+
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>IC Front Image:</label>
+
+            <input
+              type="file"
+              accept="image/*,application/pdf"
+              onChange={(e) => handleFileChange(e, "icFront")}
+            />
+          </div>
+
+          <div>
+            <label>IC Back Image:</label>
+
+            <input
+              type="file"
+              accept="image/*,application/pdf"
+              onChange={(e) => handleFileChange(e, "icBack")}
+            />
+          </div>
+
+          <div>
+            <label>Bank Slip:</label>
+
+            <input
+              type="file"
+              accept="image/*,application/pdf"
+              onChange={(e) => handleFileChange(e, "bankSlip")}
+            />
+          </div>
+          <div className="preview-box">
+
+            <h3>
+              {files.icFront || files.icBack || files.bankSlip
+                ? "Uploaded Documents"
+                : "No document uploaded yet"}
+            </h3>
+
+            {files.icFront && (
+              <div className="file-card">
+                <img src={files.icFront.preview} alt="IC Front" />
+
+                <div>
+                  <p>IC Front</p>
+                  <small>{files.icFront.file.name}</small>
+                </div>
+              </div>
+            )}
+
+            {files.icBack && (
+              <div className="file-card">
+                <img src={files.icBack.preview} alt="IC Back" />
+
+                <div>
+                  <p>IC Back</p>
+                  <small>{files.icBack.file.name}</small>
+                </div>
+              </div>
+            )}
+
+            {files.bankSlip && (
+              <div className="file-card">
+
+                {files.bankSlip.file.type === "application/pdf" ? (
+                  <div className="pdf-thumbnail">
+                    PDF
+                  </div>
+                ) : (
+                  <img src={files.bankSlip.preview} alt="Bank Slip" />
+                )}
+
+                <div>
+                  <p>Bank Slip</p>
+                  <small>{files.bankSlip.file.name}</small>
+                </div>
+
+              </div>
+            )}
+
+          </div>
+
+          <div>
+            <label>
+              <input type="checkbox" />
+
+              By Clicking on Submit, You agree to Nirvana's{" "}
+              <a href="/terms-and-conditions.pdf" target="_blank">
+                Terms and Conditions of Use
+              </a>
+            </label>
+
+            <br />
+
+            <span>
+              To learn more about how Nirvana collects, uses, shares, and protects your personal data,
+              please see Nirvana's{" "}
+              <a href="/privacy-policy.pdf" target="_blank">
+                Privacy Policy
+              </a>
+            </span>
+          </div>
+
+          <button type="submit">
+            Submit
+          </button>
+        </form>
+        {qrCode && (
+          <div className="qr-box">
+            <h3>Upload Successful</h3>
+
+            <p>Please scan this QR code at the kiosk.</p>
+
+            <QRCodeCanvas
+              value={qrCode}
+              size={200}
+            />
+
+            <p>{qrCode}</p>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 
