@@ -13,6 +13,7 @@ pdfjs.GlobalWorkerOptions.workerSrc =
 function App() {
 
   const [qrCode, setQrCode] = useState(null)
+  const [agree, setAgree] = useState(false)
 
   const [files, setFiles] = useState({
     icFront: null,
@@ -199,7 +200,11 @@ function App() {
 
           <div>
             <label>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                checked={agree}
+                onChange={(e) => setAgree(e.target.checked)}
+              />
 
               By Clicking on Submit, You agree to Nirvana's{" "}
               <a href="/terms-and-conditions.pdf" target="_blank">
@@ -218,7 +223,10 @@ function App() {
             </span>
           </div>
 
-          <button type="submit">
+          <button
+            type="submit"
+            disabled={!agree}
+          >
             Submit
           </button>
         </form>

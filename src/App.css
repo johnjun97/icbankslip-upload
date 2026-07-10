@@ -71,6 +71,18 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  background-color: #2563eb;
+  color: white;
+  font-size: 15px;
+}
+
+button:hover {
+  background-color: #1d4ed8;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 .preview-box {
@@ -124,4 +136,9 @@ button {
   border: 1px solid #ddd;
   border-radius: 6px;
   background: white;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
