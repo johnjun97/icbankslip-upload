@@ -3,6 +3,12 @@ import './App.css'
 import { useState } from 'react'
 import { supabase } from './lib/supabase'
 import { QRCodeCanvas } from 'qrcode.react'
+import { Document, Page, pdfjs } from 'react-pdf'
+import 'react-pdf/dist/Page/TextLayer.css'
+import 'react-pdf/dist/Page/AnnotationLayer.css'
+
+pdfjs.GlobalWorkerOptions.workerSrc =
+  `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
 function App() {
 
@@ -137,38 +143,49 @@ function App() {
                 : "No document uploaded yet"}
             </h3>
 
-            {files.icFront && (
-              <div className="file-card">
-                <img src={files.icFront.preview} alt="IC Front" />
+            <div className="ic-preview-row">
 
-                <div>
-                  <p>IC Front</p>
-                  <small>{files.icFront.file.name}</small>
+              {files.icFront && (
+                <div className="file-card">
+                  <img src={files.icFront.preview} alt="IC Front" />
+
+                  <div>
+                    <p>IC Front</p>
+                    <small>{files.icFront.file.name}</small>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {files.icBack && (
-              <div className="file-card">
-                <img src={files.icBack.preview} alt="IC Back" />
+              {files.icBack && (
+                <div className="file-card">
+                  <img src={files.icBack.preview} alt="IC Back" />
 
-                <div>
-                  <p>IC Back</p>
-                  <small>{files.icBack.file.name}</small>
+                  <div>
+                    <p>IC Back</p>
+                    <small>{files.icBack.file.name}</small>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+
+            </div>
 
             {files.bankSlip && (
               <div className="file-card">
 
                 {files.bankSlip.file.type === "application/pdf" ? (
                   <div className="pdf-thumbnail">
-                    PDF
+                    {console.log(files.bankSlip.preview)}
+                    <Document file={files.bankSlip.preview}>
+                      <Page
+                        pageNumber={1}
+                        width={70}
+                      />
+                    </Document>
                   </div>
                 ) : (
                   <img src={files.bankSlip.preview} alt="Bank Slip" />
                 )}
+
 
                 <div>
                   <p>Bank Slip</p>

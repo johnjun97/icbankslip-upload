@@ -42,6 +42,12 @@ form div {
   gap: 5px;
 }
 
+.ic-preview-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
 label {
   font-size: 14px;
 }
@@ -87,26 +93,35 @@ button {
 }
 
 .file-card img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  padding: 4px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box;
 }
 
-.file-card p {
-  margin: 0;
-  font-weight: bold;
+.file-card {
+  display: flex;
+  align-items: center;
 }
 
 .file-card small {
   color: #666;
 }
 
+.ic-preview-row .file-card {
+  flex: 1;
+  margin-bottom: 0;
+}
+
 .pdf-thumbnail {
-  width: 80px;
-  height: 80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #eee;
-  font-weight: bold;
+  width: 70px;
+  height: 70px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
 }
