@@ -175,7 +175,6 @@ function App() {
 
                 {files.bankSlip.file.type === "application/pdf" ? (
                   <div className="pdf-thumbnail">
-                    {console.log(files.bankSlip.preview)}
                     <Document file={files.bankSlip.preview}>
                       <Page
                         pageNumber={1}
