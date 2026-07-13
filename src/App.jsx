@@ -58,6 +58,8 @@ function App() {
     return data.path
   }
 
+
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -78,6 +80,12 @@ function App() {
         files.bankSlip?.file,
         "bank-slip"
       )
+
+      const { data: storageCheck, error: storageError } = await supabase.storage
+        .from('uploads')
+        .list('ic-front')
+
+      console.log("Upload repo storage check:", storageCheck, storageError)
 
       const qrValue = `NIR-${Date.now()}`
 
