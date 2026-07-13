@@ -6,6 +6,7 @@ import { QRCodeCanvas } from 'qrcode.react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import 'react-pdf/dist/Page/TextLayer.css'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
+import { v4 as uuidv4 } from 'uuid'
 
 pdfjs.GlobalWorkerOptions.workerSrc =
   `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
@@ -39,7 +40,7 @@ function App() {
   const uploadFile = async (file, folder) => {
     if (!file) return null
 
-    const fileName = `${Date.now()}-${file.name}`
+    const fileName = `${uuidv4()}-${file.name}`
 
     console.log("Uploading:", `${folder}/${fileName}`)
 

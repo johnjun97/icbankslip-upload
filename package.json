@@ -15,7 +15,8 @@
     "qrcode.react": "^4.2.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-pdf": "^10.4.1"
+    "react-pdf": "^10.4.1",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
