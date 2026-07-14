@@ -37,13 +37,13 @@ function App() {
     }
   }
 
-const canSubmit = () => {
-  return (
-    (files.icFront || files.icBack || files.bankSlip) &&
-    agree &&
-    !loading
-  )
-}
+  const canSubmit = () => {
+    return (
+      (files.icFront || files.icBack || files.bankSlip) &&
+      agree &&
+      !loading
+    )
+  }
 
   const uploadFile = async (file, folder) => {
     if (!file) return null
@@ -66,7 +66,12 @@ const canSubmit = () => {
     return data.path
   }
 
-
+  const removeFile = (fileName) => {
+    setFiles({
+      ...files,
+      [fileName]: null
+    })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -210,7 +215,7 @@ const canSubmit = () => {
               />
 
               <p className="file-note">
-                Accepted file formats: JPG, JPEG, PNG, PDF
+                Supported file formats: JPG, JPEG, PNG, PDF
               </p>
             </div>
             <div className="preview-box">
@@ -225,22 +230,42 @@ const canSubmit = () => {
 
                 {files.icFront && (
                   <div className="file-card">
+
+                    <button
+                      className="remove-btn"
+                      onClick={() => removeFile("icFront")}
+                      type="button"
+                    >
+                      X
+                    </button>
+
                     <img src={files.icFront.preview} alt="IC Front" />
 
                     <div>
                       <p>IC Front</p>
                       <small>{files.icFront.file.name}</small>
                     </div>
+
                   </div>
                 )}
 
                 {files.icBack && (
                   <div className="file-card">
+
+                    <button
+                      className="remove-btn"
+                      onClick={() => removeFile("icBack")}
+                      type="button"
+                    >
+                      X
+                    </button>
                     <img src={files.icBack.preview} alt="IC Back" />
 
                     <div>
                       <p>IC Back</p>
                       <small>{files.icBack.file.name}</small>
+
+
                     </div>
                   </div>
                 )}
@@ -249,6 +274,14 @@ const canSubmit = () => {
 
               {files.bankSlip && (
                 <div className="file-card">
+
+                  <button
+                    className="remove-btn"
+                    onClick={() => removeFile("bankSlip")}
+                    type="button"
+                  >
+                    X
+                  </button>
 
                   {files.bankSlip.file.type === "application/pdf" ? (
                     <div className="pdf-thumbnail">

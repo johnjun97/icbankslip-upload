@@ -95,6 +95,8 @@ button:disabled {
 }
 
 .file-card {
+  position: relative;
+
   display: flex;
   align-items: center;
   gap: 15px;
@@ -115,11 +117,6 @@ button:disabled {
   box-sizing: border-box;
 }
 
-.file-card {
-  display: flex;
-  align-items: center;
-}
-
 .file-card small {
   color: #666;
 }
@@ -136,11 +133,6 @@ button:disabled {
   border: 1px solid #ddd;
   border-radius: 6px;
   background: white;
-}
-
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
 }
 
 .loading-overlay {
@@ -188,4 +180,27 @@ button:disabled {
   font-size: 20px;
   font-weight: bold;
   letter-spacing: 1px;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+
+  width: 22px;
+  height: 22px;
+
+  padding: 0;
+  line-height: 22px;
+
+  border-radius: 50%;
+  border: none;
+
+  background: red;
+  color: white;
+
+  font-weight: bold;
+  cursor: pointer;
+
+  z-index: 10;
 }
