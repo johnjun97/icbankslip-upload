@@ -37,6 +37,14 @@ function App() {
     }
   }
 
+const canSubmit = () => {
+  return (
+    (files.icFront || files.icBack || files.bankSlip) &&
+    agree &&
+    !loading
+  )
+}
+
   const uploadFile = async (file, folder) => {
     if (!file) return null
 
@@ -114,6 +122,45 @@ function App() {
     }
   }
 
+  if (qrCode) {
+    return (
+      <div className="app">
+        <div className="form-container qr-success">
+
+          <img src={logo} alt="Logo" />
+
+          <h2>Upload Successful</h2>
+
+          <p>
+            Please scan this QR code at the kiosk.
+          </p>
+
+          <QRCodeCanvas
+            value={qrCode}
+            size={250}
+          />
+
+          <p>{qrCode}</p>
+
+          <button
+            onClick={() => {
+              setQrCode(null)
+              setFiles({
+                icFront: null,
+                icBack: null,
+                bankSlip: null
+              })
+              setAgree(false)
+            }}
+          >
+            Upload Another Document
+          </button>
+
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
       {loading && (
@@ -161,6 +208,10 @@ function App() {
                 accept="image/*,application/pdf"
                 onChange={(e) => handleFileChange(e, "bankSlip")}
               />
+
+              <p className="file-note">
+                Accepted file formats: JPG, JPEG, PNG, PDF
+              </p>
             </div>
             <div className="preview-box">
 
@@ -250,7 +301,7 @@ function App() {
 
             <button
               type="submit"
-              disabled={!agree || loading}
+              disabled={!canSubmit()}
             >
               {loading ? "Uploading..." : "Submit"}
             </button>

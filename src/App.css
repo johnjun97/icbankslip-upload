@@ -160,3 +160,32 @@ button:disabled {
   font-size: 18px;
   font-weight: bold;
 }
+
+.file-note {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.qr-success {
+  text-align: center;
+}
+
+.qr-success h2 {
+  margin: 20px 0 10px;
+}
+
+.qr-success p {
+  margin: 10px 0;
+}
+
+.qr-success canvas {
+  margin: 25px 0;
+}
+
+.qr-reference {
+  margin-top: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
