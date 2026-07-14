@@ -1,0 +1,59 @@
+.monitor-page {
+  min-height: 100vh;
+  background-color: #f5f6fa;
+  padding: 40px;
+  box-sizing: border-box;
+  color: #222;
+}
+
+
+.monitor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+
+.monitor-header h1 {
+  margin: 0;
+}
+
+
+.filter-select {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: white;
+  font-size: 14px;
+}
+
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+
+.monitor-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+
+.monitor-card h2 {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+
+.monitor-card p {
+  font-size: 40px;
+  font-weight: bold;
+  margin: 0;
+  color: #2563eb;
+}
