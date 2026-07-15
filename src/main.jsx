@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import App from './App.jsx'
 import Monitor from './Monitor.jsx'
+import MonitorLogin from './MonitorLogin.jsx'
 
 
 createRoot(document.getElementById('root')).render(
@@ -17,6 +18,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/" element={<App />} />
 
         <Route path="/monitor" element={<Monitor />} />
+
+        <Route path="/monitor-login" element={<MonitorLogin />} />
 
       </Routes>
 
