@@ -49,3 +49,12 @@
 .monitor-login-card button:hover {
     background: #444;
 }
+
+.monitor-loading {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: #555;
+}

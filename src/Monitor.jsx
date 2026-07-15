@@ -116,7 +116,11 @@ function Monitor() {
     }
 
     if (checkingUser) {
-        return <h2>Loading...</h2>
+        return (
+            <div className="monitor-loading">
+                Checking login...
+            </div>
+        )
     }
 
     const logout = async () => {
