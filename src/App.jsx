@@ -108,7 +108,8 @@ function App() {
           ic_front_path: icFrontPath,
           ic_back_path: icBackPath,
           bank_slip_path: bankSlipPath,
-          qrcode: qrValue
+          qrcode: qrValue,
+          status: "Pending"
         })
         .single()
 
