@@ -45,6 +45,7 @@ function App() {
   const [qrCode, setQrCode] = useState(null)
   const [agree, setAgree] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [uploadStatus, setUploadStatus] = useState("")
 
   const [files, setFiles] = useState({
     icFront: null,
@@ -115,20 +116,58 @@ function App() {
     setLoading(true)
 
     try {
-      const icFrontPath = await uploadFile(
-        files.icFront?.file,
-        "ic-front"
-      )
 
-      const icBackPath = await uploadFile(
-        files.icBack?.file,
-        "ic-back"
-      )
+      const uploadList = []
 
-      const bankSlipPath = await uploadFile(
-        files.bankSlip?.file,
-        "bank-slip"
-      )
+      if (files.icFront) {
+        uploadList.push({
+          key: "icFront",
+          name: "IC Front",
+          folder: "ic-front",
+          file: files.icFront.file
+        })
+      }
+
+      if (files.icBack) {
+        uploadList.push({
+          key: "icBack",
+          name: "IC Back",
+          folder: "ic-back",
+          file: files.icBack.file
+        })
+      }
+
+      if (files.bankSlip) {
+        uploadList.push({
+          key: "bankSlip",
+          name: "Bank Slip",
+          folder: "bank-slip",
+          file: files.bankSlip.file
+        })
+      }
+
+
+      const uploadResult = {}
+
+      for (let i = 0; i < uploadList.length; i++) {
+
+        const item = uploadList[i]
+
+        setUploadStatus(
+          `Uploading ${item.name} (${i + 1}/${uploadList.length})`
+        )
+
+        const path = await uploadFile(
+          item.file,
+          item.folder
+        )
+
+        if (!path) {
+          throw new Error(`Failed to upload ${item.name}`)
+        }
+
+        uploadResult[item.key] = path
+      }
 
       // debug code
       // const { data: storageCheck, error: storageError } = await supabase.storage
@@ -142,9 +181,9 @@ function App() {
       const { data, error } = await supabase
         .from('submissions')
         .insert({
-          ic_front_path: icFrontPath,
-          ic_back_path: icBackPath,
-          bank_slip_path: bankSlipPath,
+          ic_front_path: uploadResult.icFront || null,
+          ic_back_path: uploadResult.icBack || null,
+          bank_slip_path: uploadResult.bankSlip || null,
           qrcode: qrValue,
           status: "Pending"
         })
@@ -154,6 +193,7 @@ function App() {
         throw error
       }
 
+      setUploadStatus("")
       setQrCode(qrValue)
 
     } catch (error) {
@@ -193,6 +233,7 @@ function App() {
                 bankSlip: null
               })
               setAgree(false)
+              setUploadStatus("")
             }}
           >
             Upload Another Document
@@ -208,7 +249,7 @@ function App() {
       {loading && (
         <div className="loading-overlay">
           <div className="loading-box">
-            Uploading documents...
+            {uploadStatus}
           </div>
         </div>
       )}
