@@ -131,7 +131,7 @@ function Monitor() {
             start.setHours(0, 0, 0, 0)
 
             query = query.gte(
-                'created_at',
+'printed_date',
                 start.toISOString()
             )
 
@@ -145,7 +145,7 @@ function Monitor() {
             start.setDate(now.getDate() - 7)
 
             query = query.gte(
-                'created_at',
+'printed_date',
                 start.toISOString()
             )
 
@@ -159,7 +159,7 @@ function Monitor() {
             start.setDate(now.getDate() - 30)
 
             query = query.gte(
-                'created_at',
+'printed_date',
                 start.toISOString()
             )
 
@@ -175,7 +175,7 @@ function Monitor() {
             )
 
             query = query.gte(
-                'created_at',
+'printed_date',
                 start.toISOString()
             )
 
@@ -198,11 +198,11 @@ function Monitor() {
 
             query = query
                 .gte(
-                    'created_at',
+'printed_date',
                     start.toISOString()
                 )
                 .lt(
-                    'created_at',
+'printed_date',
                     end.toISOString()
                 )
 
