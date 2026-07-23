@@ -91,3 +91,14 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
+
+.monitor-filter-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+.second-row {
+    grid-template-columns: repeat(2, 1fr);
+}

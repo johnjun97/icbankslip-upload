@@ -438,38 +438,6 @@ function Monitor() {
 
                 <div className="monitor-actions">
 
-                    <select
-                        className="filter-select"
-                        value={range}
-                        onChange={(e) => setRange(e.target.value)}
-                    >
-                        <option value="today">
-                            Today
-                        </option>
-
-                        <option value="7days">
-                            Last 7 Days
-                        </option>
-
-                        <option value="30days">
-                            Last 30 Days
-                        </option>
-
-                        <option value="month">
-                            This Month
-                        </option>
-
-                        <option value="lastMonth">
-                            Last Month
-                        </option>
-
-                        <option value="all">
-                            All Time
-                        </option>
-
-                    </select>
-
-
                     <button
                         className="logout-button"
                         onClick={logout}
@@ -480,6 +448,9 @@ function Monitor() {
                 </div>
 
             </div>
+
+
+
 
 
             <div className="dashboard-grid">
@@ -514,7 +485,7 @@ function Monitor() {
                 <div className="monitor-card">
 
                     <h2>
-                        Expired
+                        Expired Uploads
                     </h2>
 
                     <p>
@@ -522,6 +493,48 @@ function Monitor() {
                     </p>
 
                 </div>
+
+
+            </div>
+
+
+            <div className="monitor-filter-row">
+
+                <select
+                    className="filter-select"
+                    value={range}
+                    onChange={(e) => setRange(e.target.value)}
+                >
+                    <option value="today">
+                        Today
+                    </option>
+
+                    <option value="7days">
+                        Last 7 Days
+                    </option>
+
+                    <option value="30days">
+                        Last 30 Days
+                    </option>
+
+                    <option value="month">
+                        This Month
+                    </option>
+
+                    <option value="lastMonth">
+                        Last Month
+                    </option>
+
+                    <option value="all">
+                        All Time
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div className="dashboard-grid second-row">
 
                 <div className="monitor-card">
 
