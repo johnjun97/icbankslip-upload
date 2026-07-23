@@ -11,6 +11,35 @@ import { v4 as uuidv4 } from 'uuid'
 pdfjs.GlobalWorkerOptions.workerSrc =
   `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
+function FilePreview({ file, preview, alt }) {
+
+  if (file.type === "application/pdf") {
+    return (
+      <div className="pdf-thumbnail">
+        <Document
+          file={preview}
+          onLoadError={(error) => {
+            console.error("PDF preview error:", error)
+          }}
+        >
+          <Page
+            pageNumber={1}
+            width={70}
+          />
+        </Document>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={preview}
+      alt={alt}
+    />
+  )
+}
+
+
 function App() {
 
   const [qrCode, setQrCode] = useState(null)
@@ -23,31 +52,10 @@ function App() {
     bankSlip: null
   })
 
-  function FilePreview({ file, alt }) {
-
-    if (file.type === "application/pdf") {
-      return (
-        <div className="pdf-thumbnail">
-          <Document file={URL.createObjectURL(file)}>
-            <Page
-              pageNumber={1}
-              width={70}
-            />
-          </Document>
-        </div>
-      )
-    }
-
-    return (
-      <img
-        src={URL.createObjectURL(file)}
-        alt={alt}
-      />
-    )
-  }
-
   const handleFileChange = (e, fileName) => {
     const file = e.target.files[0]
+
+    if (!file) return
 
     if (file) {
       setFiles({
@@ -122,11 +130,12 @@ function App() {
         "bank-slip"
       )
 
-      const { data: storageCheck, error: storageError } = await supabase.storage
-        .from('uploads')
-        .list('ic-front')
+      // debug code
+      // const { data: storageCheck, error: storageError } = await supabase.storage
+      //   .from('uploads')
+      //   .list('ic-front')
 
-      console.log("Upload repo storage check:", storageCheck, storageError)
+      // console.log("Upload repo storage check:", storageCheck, storageError)
 
       const qrValue = `NIR-${Date.now()}`
 
@@ -218,9 +227,12 @@ function App() {
 
               <input
                 type="file"
-                accept="image/*,application/pdf"
+                accept="image/*"
                 onChange={(e) => handleFileChange(e, "icFront")}
               />
+              <p className="file-note">
+                Supported formats: JPG, JPEG, PNG
+              </p>
             </div>
 
             <div>
@@ -228,9 +240,12 @@ function App() {
 
               <input
                 type="file"
-                accept="image/*,application/pdf"
+                accept="image/*"
                 onChange={(e) => handleFileChange(e, "icBack")}
               />
+              <p className="file-note">
+                Supported formats: JPG, JPEG, PNG
+              </p>
             </div>
 
             <div>
@@ -243,7 +258,7 @@ function App() {
               />
 
               <p className="file-note">
-                Supported file formats: JPG, JPEG, PNG, PDF
+                Supported formats: JPG, JPEG, PNG, PDF
               </p>
             </div>
             <div className="preview-box">
@@ -269,6 +284,7 @@ function App() {
 
                     <FilePreview
                       file={files.icFront.file}
+                      preview={files.icFront.preview}
                       alt="IC Front"
                     />
 
@@ -292,6 +308,7 @@ function App() {
                     </button>
                     <FilePreview
                       file={files.icBack.file}
+                      preview={files.icBack.preview}
                       alt="IC Back"
                     />
 
@@ -319,6 +336,7 @@ function App() {
 
                   <FilePreview
                     file={files.bankSlip.file}
+                    preview={files.bankSlip.preview}
                     alt="Bank Slip"
                   />
 
@@ -365,20 +383,6 @@ function App() {
               {loading ? "Uploading..." : "Submit"}
             </button>
           </form>
-          {qrCode && (
-            <div className="qr-box">
-              <h3>Upload Successful</h3>
-
-              <p>Please scan this QR code at the kiosk.</p>
-
-              <QRCodeCanvas
-                value={qrCode}
-                size={200}
-              />
-
-              <p>{qrCode}</p>
-            </div>
-          )}
         </div>
       </div>
     </>
