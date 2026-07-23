@@ -74,6 +74,11 @@ function App() {
   }
 
   const handleSubmit = async (e) => {
+
+    const { data } = await supabase.auth.getSession()
+
+    console.log("Current session:", data.session)
+
     e.preventDefault()
 
     setLoading(true)
