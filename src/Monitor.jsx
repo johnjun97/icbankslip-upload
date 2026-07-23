@@ -7,7 +7,7 @@ function Monitor() {
     const [user, setUser] = useState(null)
     const [checkingUser, setCheckingUser] = useState(true)
 
-    const [range, setRange] = useState("month")
+    const [range, setRange] = useState("all")
     const [printSources, setPrintSources] = useState([])
     const [printSource, setPrintSource] = useState("all")
 
@@ -17,6 +17,8 @@ function Monitor() {
     const [expired, setExpired] = useState(null)
     const [storageFiles, setStorageFiles] = useState(null)
     const [loadingData, setLoadingData] = useState(true)
+    const [loadingTotal, setLoadingTotal] = useState(true)
+    const [loadingPrinted, setLoadingPrinted] = useState(true)
 
     const loadPrintSources = async () => {
 
@@ -78,57 +80,84 @@ function Monitor() {
     }, [])
 
     useEffect(() => {
+        if (user) {
+            loadTotalUploads()
+        }
+    }, [range, user])
 
+
+    useEffect(() => {
+        if (user) {
+            loadPrinted()
+        }
+    }, [range, printSource, user])
+
+    useEffect(() => {
         if (user) {
             loadData()
         }
+    }, [user])
 
-    }, [range, printSource, user])
+    const loadPrinted = async () => {
+        setLoadingPrinted(true)
 
-    const loadData = async () => {
-
-        setLoadingData(true)
-let query = supabase
-    .from('submissions')
-    .select('*', { count: 'exact', head: true })
-
-if (printSource !== "all") {
-
-    query = query.eq(
-        'printed_from',
-        printSource
-    )
-
-}
         const now = new Date()
+
+        let query = supabase
+            .from('submissions')
+            .select('*', {
+                count: 'exact',
+                head: true
+            })
+            .eq(
+                'status',
+                'Printed'
+            )
+
+
+        if (printSource !== "all") {
+
+            query = query.eq(
+                'printed_from',
+                printSource
+            )
+
+        }
 
 
         if (range === "today") {
+
             const start = new Date()
             start.setHours(0, 0, 0, 0)
+
             query = query.gte(
                 'created_at',
                 start.toISOString()
             )
+
         }
+
 
         if (range === "7days") {
 
+            const now = new Date()
             const start = new Date()
-            start.setDate(
-                now.getDate() - 7
-            )
+            start.setDate(now.getDate() - 7)
+
             query = query.gte(
                 'created_at',
                 start.toISOString()
             )
+
         }
+
+
         if (range === "30days") {
 
+            const now = new Date()
             const start = new Date()
-            start.setDate(
-                now.getDate() - 30
-            )
+            start.setDate(now.getDate() - 30)
+
             query = query.gte(
                 'created_at',
                 start.toISOString()
@@ -138,16 +167,20 @@ if (printSource !== "all") {
 
 
         if (range === "month") {
+
             const start = new Date(
                 now.getFullYear(),
                 now.getMonth(),
                 1
             )
+
             query = query.gte(
                 'created_at',
                 start.toISOString()
             )
+
         }
+
 
         if (range === "lastMonth") {
 
@@ -172,21 +205,146 @@ if (printSource !== "all") {
                     'created_at',
                     end.toISOString()
                 )
+
         }
+
 
         const { count, error } = await query
 
+
         if (error) {
             console.error(error)
-            setLoadingData(false)
+            setLoadingPrinted(false)
             return
         }
 
-        setTotal(count)
+        setPrinted(count || 0)
+        setLoadingPrinted(false)
+    }
 
-        const getStatusCount = async (status) => {
+    const loadTotalUploads = async () => {
 
-            let statusQuery = supabase
+        setLoadingTotal(true)
+
+        let query = supabase
+            .from('submissions')
+            .select('*', {
+                count: 'exact',
+                head: true
+            })
+
+
+        if (range === "today") {
+
+            const start = new Date()
+            start.setHours(0, 0, 0, 0)
+
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
+
+        }
+
+
+        if (range === "7days") {
+
+            const start = new Date()
+            start.setDate(new Date().getDate() - 7)
+
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
+
+        }
+
+
+        if (range === "30days") {
+
+            const start = new Date()
+            start.setDate(new Date().getDate() - 30)
+
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
+
+        }
+
+
+        if (range === "month") {
+
+            const now = new Date()
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                1
+            )
+
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
+
+        }
+
+
+        if (range === "lastMonth") {
+
+            const now = new Date()
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth() - 1,
+                1
+            )
+
+            const end = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                1
+            )
+
+
+            query = query
+                .gte(
+                    'created_at',
+                    start.toISOString()
+                )
+                .lt(
+                    'created_at',
+                    end.toISOString()
+                )
+
+        }
+
+
+        const { count, error } = await query
+
+
+        if (error) {
+            console.error(error)
+            setLoadingTotal(false)
+            return
+        }
+
+
+        setTotal(count || 0)
+
+        setLoadingTotal(false)
+
+    }
+
+    const loadData = async () => {
+
+        setLoadingData(true)
+
+        // Pending and Expired ignore filters
+        const getSystemStatusCount = async (status) => {
+
+            const { count } = await supabase
                 .from('submissions')
                 .select('*', {
                     count: 'exact',
@@ -197,108 +355,13 @@ if (printSource !== "all") {
                     status
                 )
 
-            if (printSource !== "all") {
-
-                statusQuery = statusQuery.eq(
-                    'printed_from',
-                    printSource
-                )
-
-            }
-            // copy same date filter
-            if (range === "today") {
-
-                const start = new Date()
-                start.setHours(0, 0, 0, 0)
-
-                statusQuery = statusQuery.gte(
-                    'created_at',
-                    start.toISOString()
-                )
-            }
-
-
-            if (range === "7days") {
-
-                const start = new Date()
-
-                start.setDate(
-                    now.getDate() - 7
-                )
-
-                statusQuery = statusQuery.gte(
-                    'created_at',
-                    start.toISOString()
-                )
-            }
-
-
-            if (range === "30days") {
-
-                const start = new Date()
-
-                start.setDate(
-                    now.getDate() - 30
-                )
-
-                statusQuery = statusQuery.gte(
-                    'created_at',
-                    start.toISOString()
-                )
-            }
-
-
-            if (range === "month") {
-
-                const start = new Date(
-                    now.getFullYear(),
-                    now.getMonth(),
-                    1
-                )
-
-                statusQuery = statusQuery.gte(
-                    'created_at',
-                    start.toISOString()
-                )
-            }
-
-
-            if (range === "lastMonth") {
-
-                const start = new Date(
-                    now.getFullYear(),
-                    now.getMonth() - 1,
-                    1
-                )
-
-                const end = new Date(
-                    now.getFullYear(),
-                    now.getMonth(),
-                    1
-                )
-
-                statusQuery = statusQuery
-                    .gte(
-                        'created_at',
-                        start.toISOString()
-                    )
-                    .lt(
-                        'created_at',
-                        end.toISOString()
-                    )
-            }
-
-
-            const result = await statusQuery
-
-            return result.count || 0
+            return count || 0
 
         }
 
 
-        setPrinted(await getStatusCount("Printed"))
-        setPending(await getStatusCount("Pending"))
-        setExpired(await getStatusCount("Expired"))
+        setPending(await getSystemStatusCount("Pending"))
+        setExpired(await getSystemStatusCount("Expired"))
 
         const countStorageFiles = async () => {
 
@@ -333,9 +396,9 @@ if (printSource !== "all") {
         }
 
 
-        setStorageFiles(
-            await countStorageFiles()
-        )
+        const files = await countStorageFiles()
+
+        setStorageFiles(files)
 
         setLoadingData(false)
 
@@ -407,30 +470,6 @@ if (printSource !== "all") {
                     </select>
 
 
-                    <select
-                        className="filter-select"
-                        value={printSource}
-                        onChange={(e) => setPrintSource(e.target.value)}
-                    >
-
-                        <option value="all">
-                            All Sources
-                        </option>
-
-                        {
-                            printSources.map((source) => (
-                                <option
-                                    key={source}
-                                    value={source}
-                                >
-                                    {source}
-                                </option>
-                            ))
-                        }
-
-                    </select>
-
-
                     <button
                         className="logout-button"
                         onClick={logout}
@@ -445,26 +484,15 @@ if (printSource !== "all") {
 
             <div className="dashboard-grid">
 
-                <div className="monitor-card">
-
-                    <h2>
-                        Total Uploads
-                    </h2>
-
-                    <p>
-                        {loadingData ? "Loading..." : total}
-                    </p>
-
-                </div>
 
                 <div className="monitor-card">
 
                     <h2>
-                        Total Printed
+                        Storage Files
                     </h2>
 
                     <p>
-                        {loadingData ? "Loading..." : printed}
+                        {loadingData ? "Loading..." : storageFiles}
                     </p>
 
                 </div>
@@ -498,18 +526,61 @@ if (printSource !== "all") {
                 <div className="monitor-card">
 
                     <h2>
-                        Storage Files
+                        Total Uploads
                     </h2>
 
                     <p>
-                        {loadingData ? "Loading..." : storageFiles}
+                        {loadingTotal ? "Loading..." : total}
+                    </p>
+
+                </div>
+
+
+                <div className="monitor-card printed-card">
+
+                    <div className="card-title-row">
+
+                        <h2>
+                            Total Printed From
+                        </h2>
+
+
+                        <select
+                            className="filter-select"
+                            value={printSource}
+                            onChange={(e) => setPrintSource(e.target.value)}
+                        >
+
+                            <option value="all">
+                                All Sources
+                            </option>
+
+                            {
+                                printSources.map((source) => (
+                                    <option
+                                        key={source}
+                                        value={source}
+                                    >
+                                        {source}
+                                    </option>
+                                ))
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <p>
+                        {loadingPrinted ? "Loading..." : printed}
                     </p>
 
                 </div>
 
             </div>
-
         </div>
+
     )
 }
+
 export default Monitor

@@ -28,14 +28,6 @@
   font-size: 14px;
 }
 
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-
 .monitor-card {
   background: white;
   padding: 25px;
@@ -57,13 +49,6 @@
   margin: 0;
   color: #2563eb;
 }
-
-.monitor-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
 
 .monitor-actions {
     display: flex;
@@ -88,4 +73,21 @@
 
 .logout-button:hover {
     background: #c9302c;
+}
+
+.card-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.printed-card .filter-select {
+    width: auto;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
