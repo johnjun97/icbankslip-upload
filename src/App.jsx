@@ -23,6 +23,29 @@ function App() {
     bankSlip: null
   })
 
+  function FilePreview({ file, alt }) {
+
+    if (file.type === "application/pdf") {
+      return (
+        <div className="pdf-thumbnail">
+          <Document file={URL.createObjectURL(file)}>
+            <Page
+              pageNumber={1}
+              width={70}
+            />
+          </Document>
+        </div>
+      )
+    }
+
+    return (
+      <img
+        src={URL.createObjectURL(file)}
+        alt={alt}
+      />
+    )
+  }
+
   const handleFileChange = (e, fileName) => {
     const file = e.target.files[0]
 
@@ -244,7 +267,10 @@ function App() {
                       X
                     </button>
 
-                    <img src={files.icFront.preview} alt="IC Front" />
+                    <FilePreview
+                      file={files.icFront.file}
+                      alt="IC Front"
+                    />
 
                     <div>
                       <p>IC Front</p>
@@ -264,7 +290,10 @@ function App() {
                     >
                       X
                     </button>
-                    <img src={files.icBack.preview} alt="IC Back" />
+                    <FilePreview
+                      file={files.icBack.file}
+                      alt="IC Back"
+                    />
 
                     <div>
                       <p>IC Back</p>
@@ -288,18 +317,10 @@ function App() {
                     X
                   </button>
 
-                  {files.bankSlip.file.type === "application/pdf" ? (
-                    <div className="pdf-thumbnail">
-                      <Document file={files.bankSlip.preview}>
-                        <Page
-                          pageNumber={1}
-                          width={70}
-                        />
-                      </Document>
-                    </div>
-                  ) : (
-                    <img src={files.bankSlip.preview} alt="Bank Slip" />
-                  )}
+                  <FilePreview
+                    file={files.bankSlip.file}
+                    alt="Bank Slip"
+                  />
 
 
                   <div>
