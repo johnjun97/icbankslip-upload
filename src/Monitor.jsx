@@ -249,6 +249,8 @@ function Monitor() {
         }
 
 
+
+
         const { count, error } = await query
 
 
@@ -284,6 +286,105 @@ function Monitor() {
             )
         }
 
+        const now = new Date()
+
+        if (range === "today") {
+
+            const start = new Date()
+            start.setHours(0, 0, 0, 0)
+
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
+
+        }
+
+        if (range === "yesterday") {
+
+            const start = new Date()
+            start.setDate(start.getDate() - 1)
+            start.setHours(0, 0, 0, 0)
+
+            const end = new Date(start)
+            end.setDate(end.getDate() + 1)
+
+            query = query
+                .gte(
+                    'created_at',
+                    start.toISOString()
+                )
+                .lt(
+                    'created_at',
+                    end.toISOString()
+                )
+
+        }
+
+        if (range === "7days") {
+
+            const start = new Date()
+            start.setDate(now.getDate() - 7)
+
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
+
+        }
+
+        if (range === "30days") {
+
+            const start = new Date()
+            start.setDate(now.getDate() - 30)
+
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
+
+        }
+
+        if (range === "month") {
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                1
+            )
+
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
+
+        }
+
+        if (range === "lastMonth") {
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth() - 1,
+                1
+            )
+
+            const end = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                1
+            )
+
+            query = query
+                .gte(
+                    'created_at',
+                    start.toISOString()
+                )
+                .lt(
+                    'created_at',
+                    end.toISOString()
+                )
+
+        }
 
         const { data, error } = await query
 
@@ -340,6 +441,7 @@ function Monitor() {
                     grouped[printedDate] = {
                         date: printedDate,
                         uploads: 0,
+                        uploadFiles: 0,
                         printed: 0
                     }
                 }
@@ -353,7 +455,9 @@ function Monitor() {
 
 
         setChartData(
-            Object.values(grouped)
+            Object.values(grouped).sort(
+                (a, b) => new Date(a.date) - new Date(b.date)
+            )
         )
 
     }
@@ -940,12 +1044,16 @@ function Monitor() {
                             type="monotone"
                             dataKey="uploads"
                             name="Total Uploads"
+                            stroke="#8884d8"
+                            strokeWidth={2}
                         />
 
                         <Line
                             type="monotone"
                             dataKey="uploadFiles"
                             name="Total Upload Files"
+                            stroke="#82ca9d"
+                            strokeWidth={2}
                         />
 
 
@@ -953,6 +1061,8 @@ function Monitor() {
                             type="monotone"
                             dataKey="printed"
                             name="Total Printed"
+                            stroke="#ff7300"
+                            strokeWidth={2}
                         />
 
                     </LineChart>
