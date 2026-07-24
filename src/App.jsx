@@ -7,6 +7,7 @@ import { Document, Page, pdfjs } from 'react-pdf'
 import 'react-pdf/dist/Page/TextLayer.css'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
 import { v4 as uuidv4 } from 'uuid'
+import { debugLog, debugError } from './lib/debug'
 
 pdfjs.GlobalWorkerOptions.workerSrc =
   `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
@@ -19,7 +20,7 @@ function FilePreview({ file, preview, alt }) {
         <Document
           file={preview}
           onLoadError={(error) => {
-            console.error("PDF preview error:", error)
+            debugError("PDF preview error:", error)
           }}
         >
           <Page
@@ -82,16 +83,16 @@ function App() {
 
     const fileName = `${uuidv4()}-${file.name}`
 
-    console.log("Uploading:", `${folder}/${fileName}`)
+    debugLog("Uploading:", `${folder}/${fileName}`)
 
     const { data, error } = await supabase.storage
       .from('uploads')
       .upload(`${folder}/${fileName}`, file)
 
-    console.log("Upload response:", data, error)
+    debugLog("Upload response:", data, error)
 
     if (error) {
-      console.error('Upload error:', error)
+      debugError('Upload error:', error)
       return null
     }
 
@@ -107,11 +108,13 @@ function App() {
 
   const handleSubmit = async (e) => {
 
-    const { data } = await supabase.auth.getSession()
-
-    console.log("Current session:", data.session)
-
     e.preventDefault()
+
+if (import.meta.env.VITE_DEBUG === "true") {
+    const { data } = await supabase.auth.getSession()
+    debugLog("Current session:", data.session)
+}
+
 
     setLoading(true)
 
@@ -197,7 +200,7 @@ function App() {
       setQrCode(qrValue)
 
     } catch (error) {
-      console.error(error)
+      debugError(error)
 
     } finally {
       setLoading(false)
