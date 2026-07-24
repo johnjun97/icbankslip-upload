@@ -264,9 +264,9 @@ function Monitor() {
 
     const loadChartData = async () => {
 
-let query = supabase
-    .from('submissions')
-    .select(`
+        let query = supabase
+            .from('submissions')
+            .select(`
         created_at,
         printed_date,
         status,
@@ -481,162 +481,162 @@ let query = supabase
 
     }
 
-const loadTotalUploadFiles = async () => {
+    const loadTotalUploadFiles = async () => {
 
-    setLoadingUploadFiles(true)
+        setLoadingUploadFiles(true)
 
-    let query = supabase
-        .from('submissions')
-        .select(`
+        let query = supabase
+            .from('submissions')
+            .select(`
             ic_front_path,
             ic_back_path,
             bank_slip_path
         `)
 
 
-    const now = new Date()
+        const now = new Date()
 
 
-    if (range === "yesterday") {
+        if (range === "yesterday") {
 
-        const start = new Date()
-        start.setDate(start.getDate() - 1)
-        start.setHours(0, 0, 0, 0)
+            const start = new Date()
+            start.setDate(start.getDate() - 1)
+            start.setHours(0, 0, 0, 0)
 
-        const end = new Date(start)
-        end.setDate(end.getDate() + 1)
+            const end = new Date(start)
+            end.setDate(end.getDate() + 1)
 
-        query = query
-            .gte(
+            query = query
+                .gte(
+                    'created_at',
+                    start.toISOString()
+                )
+                .lt(
+                    'created_at',
+                    end.toISOString()
+                )
+
+        }
+
+
+        if (range === "today") {
+
+            const start = new Date()
+            start.setHours(0, 0, 0, 0)
+
+            query = query.gte(
                 'created_at',
                 start.toISOString()
             )
-            .lt(
-                'created_at',
-                end.toISOString()
-            )
 
-    }
+        }
 
 
-    if (range === "today") {
+        if (range === "7days") {
 
-        const start = new Date()
-        start.setHours(0, 0, 0, 0)
+            const start = new Date()
+            start.setDate(now.getDate() - 7)
 
-        query = query.gte(
-            'created_at',
-            start.toISOString()
-        )
-
-    }
-
-
-    if (range === "7days") {
-
-        const start = new Date()
-        start.setDate(now.getDate() - 7)
-
-        query = query.gte(
-            'created_at',
-            start.toISOString()
-        )
-
-    }
-
-
-    if (range === "30days") {
-
-        const start = new Date()
-        start.setDate(now.getDate() - 30)
-
-        query = query.gte(
-            'created_at',
-            start.toISOString()
-        )
-
-    }
-
-
-    if (range === "month") {
-
-        const start = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            1
-        )
-
-        query = query.gte(
-            'created_at',
-            start.toISOString()
-        )
-
-    }
-
-
-    if (range === "lastMonth") {
-
-        const start = new Date(
-            now.getFullYear(),
-            now.getMonth() - 1,
-            1
-        )
-
-        const end = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            1
-        )
-
-
-        query = query
-            .gte(
+            query = query.gte(
                 'created_at',
                 start.toISOString()
             )
-            .lt(
+
+        }
+
+
+        if (range === "30days") {
+
+            const start = new Date()
+            start.setDate(now.getDate() - 30)
+
+            query = query.gte(
                 'created_at',
-                end.toISOString()
+                start.toISOString()
             )
 
-    }
+        }
 
 
-    const { data, error } = await query
+        if (range === "month") {
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                1
+            )
+
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
+
+        }
 
 
-    if (error) {
-        console.error(error)
+        if (range === "lastMonth") {
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth() - 1,
+                1
+            )
+
+            const end = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                1
+            )
+
+
+            query = query
+                .gte(
+                    'created_at',
+                    start.toISOString()
+                )
+                .lt(
+                    'created_at',
+                    end.toISOString()
+                )
+
+        }
+
+
+        const { data, error } = await query
+
+
+        if (error) {
+            console.error(error)
+            setLoadingUploadFiles(false)
+            return
+        }
+
+
+        let totalFiles = 0
+
+
+        data.forEach(item => {
+
+            if (item.ic_front_path) {
+                totalFiles++
+            }
+
+            if (item.ic_back_path) {
+                totalFiles++
+            }
+
+            if (item.bank_slip_path) {
+                totalFiles++
+            }
+
+        })
+
+
+        setTotalUploadFiles(totalFiles)
+
         setLoadingUploadFiles(false)
-        return
+
     }
-
-
-    let totalFiles = 0
-
-
-    data.forEach(item => {
-
-        if (item.ic_front_path) {
-            totalFiles++
-        }
-
-        if (item.ic_back_path) {
-            totalFiles++
-        }
-
-        if (item.bank_slip_path) {
-            totalFiles++
-        }
-
-    })
-
-
-    setTotalUploadFiles(totalFiles)
-
-    setLoadingUploadFiles(false)
-
-}
 
     const loadData = async () => {
 
@@ -910,7 +910,7 @@ const loadTotalUploadFiles = async () => {
             <div className="monitor-card chart-card">
 
                 <h2>
-                    Total Uploads vs Total Upload Files, Total Printed
+                    Upload and Print Statistics
                 </h2>
 
 
