@@ -17,9 +17,11 @@ function Monitor() {
     const [user, setUser] = useState(null)
     const [checkingUser, setCheckingUser] = useState(true)
 
-    const [range, setRange] = useState("all")
+    const [cardRange, setCardRange] = useState("today")
+    const [chartRange, setChartRange] = useState("7days")
     const [printSources, setPrintSources] = useState([])
-    const [printSource, setPrintSource] = useState("all")
+    const [cardPrintSource, setCardPrintSource] = useState("all")
+    const [chartPrintSource, setChartPrintSource] = useState("all")
 
     const [chartData, setChartData] = useState([])
 
@@ -103,14 +105,14 @@ function Monitor() {
             loadTotalUploadFiles()
         }
 
-    }, [range, user])
+    }, [cardRange, user])
 
 
     useEffect(() => {
         if (user) {
             loadPrinted()
         }
-    }, [range, printSource, user])
+    }, [cardRange, cardPrintSource, user])
 
     useEffect(() => {
         if (user) {
@@ -135,17 +137,18 @@ function Monitor() {
             )
 
 
-        if (printSource !== "all") {
+        if (cardPrintSource !== "all") {
 
             query = query.eq(
                 'printed_from',
-                printSource
+                cardPrintSource
             )
 
         }
 
 
-        if (range === "today") {
+        if (cardRange === "today") {
+
 
             const start = new Date()
             start.setHours(0, 0, 0, 0)
@@ -157,7 +160,8 @@ function Monitor() {
 
         }
 
-        if (range === "yesterday") {
+        if (cardRange === "yesterday") {
+
 
             const start = new Date()
             start.setDate(start.getDate() - 1)
@@ -178,7 +182,8 @@ function Monitor() {
 
         }
 
-        if (range === "7days") {
+        if (cardRange === "7days") {
+
 
             const now = new Date()
             const start = new Date()
@@ -192,7 +197,7 @@ function Monitor() {
         }
 
 
-        if (range === "30days") {
+        if (cardRange === "30days") {
 
             const now = new Date()
             const start = new Date()
@@ -206,7 +211,8 @@ function Monitor() {
         }
 
 
-        if (range === "month") {
+        if (cardRange === "month") {
+
 
             const start = new Date(
                 now.getFullYear(),
@@ -222,7 +228,8 @@ function Monitor() {
         }
 
 
-        if (range === "lastMonth") {
+        if (cardRange === "lastMonth") {
+
 
             const start = new Date(
                 now.getFullYear(),
@@ -278,50 +285,11 @@ function Monitor() {
         bank_slip_path
     `)
 
-
-        if (printSource !== "all") {
-            query = query.eq(
-                'printed_from',
-                printSource
-            )
-        }
-
         const now = new Date()
 
-        if (range === "today") {
 
-            const start = new Date()
-            start.setHours(0, 0, 0, 0)
 
-            query = query.gte(
-                'created_at',
-                start.toISOString()
-            )
-
-        }
-
-        if (range === "yesterday") {
-
-            const start = new Date()
-            start.setDate(start.getDate() - 1)
-            start.setHours(0, 0, 0, 0)
-
-            const end = new Date(start)
-            end.setDate(end.getDate() + 1)
-
-            query = query
-                .gte(
-                    'created_at',
-                    start.toISOString()
-                )
-                .lt(
-                    'created_at',
-                    end.toISOString()
-                )
-
-        }
-
-        if (range === "7days") {
+        if (chartRange === "7days") {
 
             const start = new Date()
             start.setDate(now.getDate() - 7)
@@ -333,7 +301,7 @@ function Monitor() {
 
         }
 
-        if (range === "30days") {
+        if (chartRange === "30days") {
 
             const start = new Date()
             start.setDate(now.getDate() - 30)
@@ -345,7 +313,7 @@ function Monitor() {
 
         }
 
-        if (range === "month") {
+        if (chartRange === "month") {
 
             const start = new Date(
                 now.getFullYear(),
@@ -360,7 +328,7 @@ function Monitor() {
 
         }
 
-        if (range === "lastMonth") {
+        if (chartRange === "lastMonth") {
 
             const start = new Date(
                 now.getFullYear(),
@@ -430,7 +398,14 @@ function Monitor() {
             }
 
 
-            if (item.status === "Printed" && item.printed_date) {
+            if (
+                item.status === "Printed" &&
+                item.printed_date &&
+                (
+                    chartPrintSource === "all" ||
+                    item.printed_from === chartPrintSource
+                )
+            ) {
 
                 const printedDate = new Date(
                     item.printed_date
@@ -468,7 +443,7 @@ function Monitor() {
             loadChartData()
         }
 
-    }, [range, printSource, user])
+    }, [chartRange, chartPrintSource, user])
 
     const loadTotalUploads = async () => {
 
@@ -482,7 +457,7 @@ function Monitor() {
             })
 
 
-        if (range === "today") {
+        if (cardRange === "today") {
 
             const start = new Date()
             start.setHours(0, 0, 0, 0)
@@ -494,8 +469,29 @@ function Monitor() {
 
         }
 
+        if (cardRange === "yesterday") {
 
-        if (range === "7days") {
+            const start = new Date()
+            start.setDate(start.getDate() - 1)
+            start.setHours(0, 0, 0, 0)
+
+            const end = new Date(start)
+            end.setDate(end.getDate() + 1)
+
+            query = query
+                .gte(
+                    'created_at',
+                    start.toISOString()
+                )
+                .lt(
+                    'created_at',
+                    end.toISOString()
+                )
+
+        }
+
+
+        if (cardRange === "7days") {
 
             const start = new Date()
             start.setDate(new Date().getDate() - 7)
@@ -508,7 +504,7 @@ function Monitor() {
         }
 
 
-        if (range === "30days") {
+        if (cardRange === "30days") {
 
             const start = new Date()
             start.setDate(new Date().getDate() - 30)
@@ -521,7 +517,7 @@ function Monitor() {
         }
 
 
-        if (range === "month") {
+        if (cardRange === "month") {
 
             const now = new Date()
 
@@ -539,7 +535,7 @@ function Monitor() {
         }
 
 
-        if (range === "lastMonth") {
+        if (cardRange === "lastMonth") {
 
             const now = new Date()
 
@@ -601,7 +597,7 @@ function Monitor() {
         const now = new Date()
 
 
-        if (range === "yesterday") {
+        if (cardRange === "yesterday") {
 
             const start = new Date()
             start.setDate(start.getDate() - 1)
@@ -623,7 +619,7 @@ function Monitor() {
         }
 
 
-        if (range === "today") {
+        if (cardRange === "today") {
 
             const start = new Date()
             start.setHours(0, 0, 0, 0)
@@ -636,7 +632,7 @@ function Monitor() {
         }
 
 
-        if (range === "7days") {
+        if (cardRange === "7days") {
 
             const start = new Date()
             start.setDate(now.getDate() - 7)
@@ -649,7 +645,7 @@ function Monitor() {
         }
 
 
-        if (range === "30days") {
+        if (cardRange === "30days") {
 
             const start = new Date()
             start.setDate(now.getDate() - 30)
@@ -662,7 +658,7 @@ function Monitor() {
         }
 
 
-        if (range === "month") {
+        if (cardRange === "month") {
 
             const start = new Date(
                 now.getFullYear(),
@@ -678,7 +674,7 @@ function Monitor() {
         }
 
 
-        if (range === "lastMonth") {
+        if (cardRange === "lastMonth") {
 
             const start = new Date(
                 now.getFullYear(),
@@ -907,8 +903,8 @@ function Monitor() {
 
                 <select
                     className="filter-select"
-                    value={range}
-                    onChange={(e) => setRange(e.target.value)}
+                    value={cardRange}
+                    onChange={(e) => setCardRange(e.target.value)}
                 >
                     <option value="today">
                         Today
@@ -979,8 +975,8 @@ function Monitor() {
 
                         <select
                             className="filter-select"
-                            value={printSource}
-                            onChange={(e) => setPrintSource(e.target.value)}
+                            value={cardPrintSource}
+                            onChange={(e) => setCardPrintSource(e.target.value)}
                         >
 
                             <option value="all">
@@ -1013,9 +1009,70 @@ function Monitor() {
 
             <div className="monitor-card chart-card">
 
-                <h2>
-                    Upload and Print Statistics
-                </h2>
+                <div className="card-title-row">
+
+                    <h2>
+                        Upload and Print Statistics
+                    </h2>
+
+
+                    <div className="chart-filters">
+
+                        <select
+                            className="filter-select"
+                            value={chartPrintSource}
+                            onChange={(e) => setChartPrintSource(e.target.value)}
+                        >
+
+                            <option value="all">
+                                All Sources
+                            </option>
+
+                            {
+                                printSources.map((source) => (
+                                    <option
+                                        key={source}
+                                        value={source}
+                                    >
+                                        {source}
+                                    </option>
+                                ))
+                            }
+
+                        </select>
+
+
+                        <select
+                            className="filter-select"
+                            value={chartRange}
+                            onChange={(e) => setChartRange(e.target.value)}
+                        >
+
+                            <option value="7days">
+                                Last 7 Days
+                            </option>
+
+                            <option value="30days">
+                                Last 30 Days
+                            </option>
+
+                            <option value="month">
+                                This Month
+                            </option>
+
+                            <option value="lastMonth">
+                                Last Month
+                            </option>
+
+                            <option value="all">
+                                All Time
+                            </option>
+
+                        </select>
+
+                    </div>
+        
+                </div>
 
 
                 <ResponsiveContainer

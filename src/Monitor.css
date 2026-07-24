@@ -102,3 +102,8 @@
     margin-top: 30px;
     box-sizing: border-box;
 }
+
+.chart-filters {
+    display: flex;
+    gap: 10px;
+}
