@@ -60,6 +60,49 @@ const handleFileChange = (e, fileName) => {
 
   if (!file) return
 
+
+  // Maximum file size
+  const MAX_SIZE = 5 * 1024 * 1024 // 5MB
+
+
+  if (file.size > MAX_SIZE) {
+    alert("File size cannot exceed 5MB")
+    e.target.value = ""
+    return
+  }
+
+
+  // Allowed formats
+  const allowedTypes = {
+
+    icFront: [
+      "image/jpeg",
+      "image/png"
+    ],
+
+    icBack: [
+      "image/jpeg",
+      "image/png"
+    ],
+
+    bankSlip: [
+      "image/jpeg",
+      "image/png",
+      "application/pdf"
+    ]
+
+  }
+
+
+  if (!allowedTypes[fileName].includes(file.type)) {
+
+    alert("Unsupported file format")
+    e.target.value = ""
+    return
+
+  }
+
+
   setFiles(prev => ({
     ...prev,
     [fileName]: {
