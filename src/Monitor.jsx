@@ -360,7 +360,46 @@ function Monitor() {
             return
         }
 
-        const grouped = {}
+const grouped = {}
+
+
+const startDate = new Date()
+
+if (chartRange === "7days") {
+    startDate.setDate(now.getDate() - 7)
+}
+
+if (chartRange === "30days") {
+    startDate.setDate(now.getDate() - 30)
+}
+
+if (chartRange === "month") {
+    startDate.setDate(1)
+}
+
+if (chartRange === "lastMonth") {
+    startDate.setMonth(now.getMonth() - 1)
+    startDate.setDate(1)
+}
+
+
+// create empty dates
+for (
+    let date = new Date(startDate);
+    date <= now;
+    date.setDate(date.getDate() + 1)
+) {
+
+    const dateString = date.toLocaleDateString()
+
+    grouped[dateString] = {
+        date: dateString,
+        uploads: 0,
+        uploadFiles: 0,
+        printed: 0
+    }
+
+}
 
 
         data.forEach(item => {
