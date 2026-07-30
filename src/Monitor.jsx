@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabase'
 import './Monitor.css'
 import {
-    LineChart,
-    Line,
+    BarChart,
+    Bar,
     XAxis,
     YAxis,
     Tooltip,
@@ -360,46 +360,46 @@ function Monitor() {
             return
         }
 
-const grouped = {}
+        const grouped = {}
 
 
-const startDate = new Date()
+        const startDate = new Date()
 
-if (chartRange === "7days") {
-    startDate.setDate(now.getDate() - 7)
-}
+        if (chartRange === "7days") {
+            startDate.setDate(now.getDate() - 7)
+        }
 
-if (chartRange === "30days") {
-    startDate.setDate(now.getDate() - 30)
-}
+        if (chartRange === "30days") {
+            startDate.setDate(now.getDate() - 30)
+        }
 
-if (chartRange === "month") {
-    startDate.setDate(1)
-}
+        if (chartRange === "month") {
+            startDate.setDate(1)
+        }
 
-if (chartRange === "lastMonth") {
-    startDate.setMonth(now.getMonth() - 1)
-    startDate.setDate(1)
-}
+        if (chartRange === "lastMonth") {
+            startDate.setMonth(now.getMonth() - 1)
+            startDate.setDate(1)
+        }
 
 
-// create empty dates
-for (
-    let date = new Date(startDate);
-    date <= now;
-    date.setDate(date.getDate() + 1)
-) {
+        // create empty dates
+        for (
+            let date = new Date(startDate);
+            date <= now;
+            date.setDate(date.getDate() + 1)
+        ) {
 
-    const dateString = date.toLocaleDateString()
+            const dateString = date.toLocaleDateString()
 
-    grouped[dateString] = {
-        date: dateString,
-        uploads: 0,
-        uploadFiles: 0,
-        printed: 0
-    }
+            grouped[dateString] = {
+                date: dateString,
+                uploads: 0,
+                uploadFiles: 0,
+                printed: 0
+            }
 
-}
+        }
 
 
         data.forEach(item => {
@@ -1070,9 +1070,7 @@ for (
                     height={300}
                 >
 
-                    <LineChart
-                        data={chartData}
-                    >
+                    <BarChart data={chartData}>
 
                         <CartesianGrid />
 
@@ -1086,33 +1084,25 @@ for (
 
                         <Legend />
 
-
-                        <Line
-                            type="monotone"
-                            dataKey="uploads"
-                            name="Total Uploads"
-                            stroke="#8884d8"
-                            strokeWidth={2}
-                        />
-
-                        <Line
-                            type="monotone"
-                            dataKey="uploadFiles"
-                            name="Total Upload Files"
-                            stroke="#82ca9d"
-                            strokeWidth={2}
-                        />
-
-
-                        <Line
-                            type="monotone"
+                        <Bar
                             dataKey="printed"
                             name="Total Printed"
-                            stroke="#ff7300"
-                            strokeWidth={2}
+                            fill="#ff7300"
                         />
 
-                    </LineChart>
+                        <Bar
+                            dataKey="uploads"
+                            name="Total Uploads"
+                            fill="#8884d8"
+                        />
+
+                        <Bar
+                            dataKey="uploadFiles"
+                            name="Total Upload Files"
+                            fill="#82ca9d"
+                        />
+
+                    </BarChart>
 
                 </ResponsiveContainer>
 
