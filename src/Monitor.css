@@ -107,3 +107,27 @@
     display: flex;
     gap: 10px;
 }
+
+.custom-chart-legend {
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+.custom-chart-legend li {
+    display: inline-block;
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+.legend-printed {
+    color: #ff7300;
+}
+
+.legend-uploads {
+    color: #8884d8;
+}
+
+.legend-upload-files {
+    color: #82ca9d;
+}

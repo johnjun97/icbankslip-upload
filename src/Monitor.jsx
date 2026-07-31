@@ -1082,7 +1082,31 @@ function Monitor() {
 
                         <Tooltip />
 
-                        <Legend />
+                        <Legend
+                            content={() => (
+                                <ul className="custom-chart-legend">
+
+                                    <li>
+                                        <span className="legend-printed">
+                                            ■ Total Printed
+                                        </span>
+                                    </li>
+
+                                    <li>
+                                        <span className="legend-uploads">
+                                            ■ Total Uploads
+                                        </span>
+                                    </li>
+
+                                    <li>
+                                        <span className="legend-upload-files">
+                                            ■ Total Upload Files
+                                        </span>
+                                    </li>
+
+                                </ul>
+                            )}
+                        />
 
                         <Bar
                             dataKey="printed"
