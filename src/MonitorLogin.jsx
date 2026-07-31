@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { supabase } from "./lib/supabase"
 import './MonitorLogin.css'
 
@@ -7,6 +7,25 @@ function MonitorLogin() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
+    useEffect(() => {
+
+        const checkSession = async () => {
+
+            const {
+                data
+            } = await supabase.auth.getUser()
+
+
+            if (data.user) {
+                window.location.href = "/monitor"
+            }
+
+        }
+
+
+        checkSession()
+
+    }, [])
 
     const login = async () => {
 
