@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { FaEye, FaEyeSlash } from "react-icons/fa"
 import { supabase } from "./lib/supabase"
 import './MonitorLogin.css'
 
@@ -6,6 +7,7 @@ function MonitorLogin() {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
 
     useEffect(() => {
 
@@ -59,17 +61,33 @@ function MonitorLogin() {
                     onChange={(e) => setEmail(e.target.value)}
                 />
 
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            login()
-                        }
-                    }}
-                />
+<div className="password-wrapper">
+
+    <input
+        type={showPassword ? "text" : "password"}
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        onKeyDown={(e) => {
+            if (e.key === "Enter") {
+                login()
+            }
+        }}
+    />
+
+
+    <span
+        className="eye-icon"
+        onClick={() => setShowPassword(!showPassword)}
+    >
+        {
+            showPassword
+                ? <FaEyeSlash />
+                : <FaEye />
+        }
+    </span>
+
+</div>
 
                 <button onClick={login}>
                     Login
