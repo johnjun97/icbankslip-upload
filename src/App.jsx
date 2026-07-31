@@ -54,63 +54,63 @@ function App() {
     bankSlip: null
   })
 
-const handleFileChange = (e, fileName) => {
+  const handleFileChange = (e, fileName) => {
 
-  const file = e.target.files[0]
+    const file = e.target.files[0]
 
-  if (!file) return
-
-
-  // Maximum file size
-  const MAX_SIZE = 5 * 1024 * 1024 // 5MB
+    if (!file) return
 
 
-  if (file.size > MAX_SIZE) {
-    alert("File size cannot exceed 5MB")
-    e.target.value = ""
-    return
-  }
+    // Maximum file size
+    const MAX_SIZE = 5 * 1024 * 1024 // 5MB
 
 
-  // Allowed formats
-  const allowedTypes = {
-
-    icFront: [
-      "image/jpeg",
-      "image/png"
-    ],
-
-    icBack: [
-      "image/jpeg",
-      "image/png"
-    ],
-
-    bankSlip: [
-      "image/jpeg",
-      "image/png",
-      "application/pdf"
-    ]
-
-  }
-
-
-  if (!allowedTypes[fileName].includes(file.type)) {
-
-    alert("Unsupported file format")
-    e.target.value = ""
-    return
-
-  }
-
-
-  setFiles(prev => ({
-    ...prev,
-    [fileName]: {
-      file: file,
-      preview: URL.createObjectURL(file)
+    if (file.size > MAX_SIZE) {
+      alert("File size cannot exceed 5MB")
+      e.target.value = ""
+      return
     }
-  }))
-}
+
+
+    // Allowed formats
+    const allowedTypes = {
+
+      icFront: [
+        "image/jpeg",
+        "image/png"
+      ],
+
+      icBack: [
+        "image/jpeg",
+        "image/png"
+      ],
+
+      bankSlip: [
+        "image/jpeg",
+        "image/png",
+        "application/pdf"
+      ]
+
+    }
+
+
+    if (!allowedTypes[fileName].includes(file.type)) {
+
+      alert("Unsupported file format")
+      e.target.value = ""
+      return
+
+    }
+
+
+    setFiles(prev => ({
+      ...prev,
+      [fileName]: {
+        file: file,
+        preview: URL.createObjectURL(file)
+      }
+    }))
+  }
 
   const canSubmit = () => {
     return (
@@ -133,25 +133,31 @@ const handleFileChange = (e, fileName) => {
 
     debugLog("Upload response:", data, error)
 
-    if (error) {
-      debugError("Upload error:", error)
-      return null
-    }
+if (error) {
+
+  debugError("Upload error:", error)
+
+  setUploadStatus(
+    `Upload Error: ${error.message}`
+  )
+
+  return null
+}
 
     return data.path
   }
 
-const removeFile = (fileName) => {
+  const removeFile = (fileName) => {
 
-  if (files[fileName]?.preview) {
-    URL.revokeObjectURL(files[fileName].preview)
+    if (files[fileName]?.preview) {
+      URL.revokeObjectURL(files[fileName].preview)
+    }
+
+    setFiles(prev => ({
+      ...prev,
+      [fileName]: null
+    }))
   }
-
-  setFiles(prev => ({
-    ...prev,
-    [fileName]: null
-  }))
-}
 
   const handleSubmit = async (e) => {
 
@@ -232,15 +238,28 @@ const removeFile = (fileName) => {
         })
 
       if (error) {
-        throw error
+
+        debugError("Database insert error:", error)
+
+        setUploadStatus(
+          `Database Error: ${error.message}`
+        )
+
+        return
       }
 
       setUploadStatus("")
       setQrCode(qrValue)
 
-    } catch (error) {
-      debugError("Submit error:", error)
-    } finally {
+} catch (error) {
+
+  debugError("Submit error:", error)
+
+  setUploadStatus(
+    `Error: ${error.message}`
+  )
+
+}finally {
       setLoading(false)
     }
   }
