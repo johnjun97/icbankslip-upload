@@ -123,6 +123,7 @@ function App() {
   const uploadFile = async (file, folder) => {
     if (!file) return null
 
+    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_")
     const fileName = `${uuidv4()}-${file.name}`
 
     debugLog("Uploading:", `${folder}/${fileName}`)
