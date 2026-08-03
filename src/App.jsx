@@ -124,7 +124,7 @@ function App() {
     if (!file) return null
 
     const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_")
-    const fileName = `${uuidv4()}-${file.name}`
+    const fileName = `${uuidv4()}-${safeName}`
 
     debugLog("Uploading:", `${folder}/${fileName}`)
 
@@ -134,16 +134,16 @@ function App() {
 
     debugLog("Upload response:", data, error)
 
-if (error) {
+    if (error) {
 
-  debugError("Upload error:", error)
+      debugError("Upload error:", error)
 
-  setUploadStatus(
-    `Upload Error: ${error.message}`
-  )
+      setUploadStatus(
+        `Upload Error: ${error.message}`
+      )
 
-  return null
-}
+      return null
+    }
 
     return data.path
   }
@@ -220,7 +220,7 @@ if (error) {
         )
 
         if (!path) {
-          throw new Error(`Failed to upload ${item.name}`)
+          throw new Error(`Failed to upload ${item.name}. Please try again.`)
         }
 
         uploadResult[item.key] = path
@@ -252,15 +252,15 @@ if (error) {
       setUploadStatus("")
       setQrCode(qrValue)
 
-} catch (error) {
+    } catch (error) {
 
-  debugError("Submit error:", error)
+      debugError("Submit error:", error)
 
-  setUploadStatus(
-    `Error: ${error.message}`
-  )
+      setUploadStatus(
+        `Error: ${error.message}`
+      )
 
-}finally {
+    } finally {
       setLoading(false)
     }
   }
