@@ -396,7 +396,7 @@ if (error) {
                       alt="IC Front"
                     />
 
-                    <div>
+                    <div className="file-info">
                       <p>IC Front</p>
                       <small>{files.icFront.file.name}</small>
                     </div>
@@ -420,7 +420,7 @@ if (error) {
                       alt="IC Back"
                     />
 
-                    <div>
+                    <div className="file-info">
                       <p>IC Back</p>
                       <small>{files.icBack.file.name}</small>
 
@@ -449,7 +449,7 @@ if (error) {
                   />
 
 
-                  <div>
+                  <div className="file-info">
                     <p>Bank Slip</p>
                     <small>{files.bankSlip.file.name}</small>
                   </div>

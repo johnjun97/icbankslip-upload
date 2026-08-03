@@ -7,6 +7,7 @@ body {
 .form-container {
   background-color: white;
   width: 600px;
+  max-width: 100%;
   padding: 30px;
   border-radius: 10px;
   box-sizing: border-box;
@@ -104,6 +105,10 @@ button:disabled {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
+
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .file-card img {
@@ -118,7 +123,19 @@ button:disabled {
 }
 
 .file-card small {
+  display: block;
+  width: 100%;
   color: #666;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .ic-preview-row .file-card {
@@ -203,4 +220,39 @@ button:disabled {
   cursor: pointer;
 
   z-index: 10;
+}
+
+@media (max-width: 600px) {
+
+  .app {
+    padding: 10px;
+    align-items: flex-start;
+  }
+
+  .form-container {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .app img {
+    width: 120px;
+  }
+
+  .ic-preview-row {
+    flex-direction: column;
+  }
+
+  .ic-preview-row .file-card {
+    width: 100%;
+  }
+
+  .file-card {
+    gap: 10px;
+  }
+
+  .file-info small {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+
 }
