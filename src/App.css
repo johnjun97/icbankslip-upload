@@ -244,14 +244,32 @@ button:disabled {
 
   .ic-preview-row .file-card {
     width: 100%;
+    flex: none;
+    margin-bottom: 15px;
   }
 
-  .file-card {
-    gap: 10px;
+.file-card {
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+  .file-card img,
+  .pdf-thumbnail {
+    width: 100px;
+    height: 100px;
   }
+
+.file-info {
+  width: 100%;
+  text-align: center;
+}
 
   .file-info small {
     font-size: 12px;
+    white-space: normal;
     overflow-wrap: anywhere;
   }
 
