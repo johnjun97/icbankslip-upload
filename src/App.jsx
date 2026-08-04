@@ -361,7 +361,7 @@ function App() {
 
               <input
                 type="file"
-                accept=".jpg,.jpeg,.png,.pdf"
+                accept="image/*,application/pdf"
                 onChange={(e) => handleFileChange(e, "bankSlip")}
               />
 
