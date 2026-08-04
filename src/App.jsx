@@ -220,7 +220,7 @@ function App() {
         )
 
         if (!path) {
-          throw new Error(`Failed to upload ${item.name}. Please try again.`)
+          throw new Error(`Failed to upload ${item.name}`)
         }
 
         uploadResult[item.key] = path
@@ -335,7 +335,7 @@ function App() {
 
               <input
                 type="file"
-                accept="image/*"
+                accept=".jpg,.jpeg,.png"
                 onChange={(e) => handleFileChange(e, "icFront")}
               />
               <p className="file-note">
@@ -348,7 +348,7 @@ function App() {
 
               <input
                 type="file"
-                accept="image/*"
+                accept=".jpg,.jpeg,.png"
                 onChange={(e) => handleFileChange(e, "icBack")}
               />
               <p className="file-note">
@@ -361,7 +361,7 @@ function App() {
 
               <input
                 type="file"
-                accept="image/*,application/pdf"
+                accept=".jpg,.jpeg,.png,.pdf"
                 onChange={(e) => handleFileChange(e, "bankSlip")}
               />
 
@@ -396,7 +396,7 @@ function App() {
                       alt="IC Front"
                     />
 
-                    <div className="file-info">
+                    <div>
                       <p>IC Front</p>
                       <small>{files.icFront.file.name}</small>
                     </div>
@@ -420,7 +420,7 @@ function App() {
                       alt="IC Back"
                     />
 
-                    <div className="file-info">
+                    <div>
                       <p>IC Back</p>
                       <small>{files.icBack.file.name}</small>
 
@@ -449,7 +449,7 @@ function App() {
                   />
 
 
-                  <div className="file-info">
+                  <div>
                     <p>Bank Slip</p>
                     <small>{files.bankSlip.file.name}</small>
                   </div>
