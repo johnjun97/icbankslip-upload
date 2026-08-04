@@ -398,7 +398,11 @@ function App() {
 
                     <div>
                       <p>IC Front</p>
-                      <small>{files.icFront.file.name}</small>
+                      <small title={files.icFront.file.name}>
+                        {files.icFront.file.name.length > 25
+                          ? files.icFront.file.name.substring(0, 22) + "..."
+                          : files.icFront.file.name}
+                      </small>
                     </div>
 
                   </div>
@@ -422,7 +426,11 @@ function App() {
 
                     <div>
                       <p>IC Back</p>
-                      <small>{files.icBack.file.name}</small>
+                      <small title={files.icBack.file.name}>
+                        {files.icBack.file.name.length > 25
+                          ? files.icBack.file.name.substring(0, 22) + "..."
+                          : files.icBack.file.name}
+                      </small>
 
 
                     </div>
@@ -451,7 +459,11 @@ function App() {
 
                   <div>
                     <p>Bank Slip</p>
-                    <small>{files.bankSlip.file.name}</small>
+                    <small title={files.bankSlip.file.name}>
+                      {files.bankSlip.file.name.length > 25
+                        ? files.bankSlip.file.name.substring(0, 22) + "..."
+                        : files.bankSlip.file.name}
+                    </small>
                   </div>
 
                 </div>
