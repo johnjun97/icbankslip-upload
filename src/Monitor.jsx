@@ -481,6 +481,28 @@ function Monitor() {
 
     }, [chartRange, chartPrintSource, user])
 
+    useEffect(() => {
+
+        if (!user) return
+
+        const interval = setInterval(() => {
+
+            console.log(
+                `[Monitor] Re-fetching data at ${new Date().toLocaleTimeString()}`
+            )
+
+            loadTotalUploads()
+            loadTotalUploadFiles()
+            loadPrinted()
+            loadData()
+            loadChartData()
+
+        }, 5 * 60 * 1000) // auto re-fetch in 5 minutes
+
+        return () => clearInterval(interval)
+
+    }, [user, cardRange, cardPrintSource, chartRange, chartPrintSource])
+
     const loadTotalUploads = async () => {
 
         setLoadingTotal(true)
