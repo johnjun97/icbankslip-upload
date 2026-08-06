@@ -121,17 +121,21 @@ function Monitor() {
         }
     }, [user])
 
+    // start from here
+
     const loadPrinted = async () => {
+
         setLoadingPrinted(true)
 
         const now = new Date()
 
         let query = supabase
             .from('submissions')
-            .select('*', {
-                count: 'exact',
-                head: true
-            })
+            .select(`
+            ic_front_path,
+            ic_back_path,
+            bank_slip_path
+        `)
             .eq(
                 'status',
                 'Printed'
@@ -150,7 +154,6 @@ function Monitor() {
 
         if (cardRange === "today") {
 
-
             const start = new Date()
             start.setHours(0, 0, 0, 0)
 
@@ -161,8 +164,8 @@ function Monitor() {
 
         }
 
-        if (cardRange === "yesterday") {
 
+        if (cardRange === "yesterday") {
 
             const start = new Date()
             start.setDate(start.getDate() - 1)
@@ -183,6 +186,7 @@ function Monitor() {
 
         }
 
+
         if (cardRange === "7days") {
 
             const start = new Date()
@@ -198,7 +202,6 @@ function Monitor() {
 
         if (cardRange === "30days") {
 
-
             const start = new Date()
             start.setDate(now.getDate() - 30)
 
@@ -211,7 +214,6 @@ function Monitor() {
 
 
         if (cardRange === "month") {
-
 
             const start = new Date(
                 now.getFullYear(),
@@ -228,7 +230,6 @@ function Monitor() {
 
 
         if (cardRange === "lastMonth") {
-
 
             const start = new Date(
                 now.getFullYear(),
@@ -255,20 +256,196 @@ function Monitor() {
         }
 
 
-
-
-        const { count, error } = await query
+        const { data, error } = await query
 
 
         if (error) {
-            debugError("Load printed error:", error)
+
+            debugError(
+                "Load printed files error:",
+                error
+            )
+
             setLoadingPrinted(false)
+
             return
+
         }
 
-        setPrinted(count || 0)
+
+        let totalFiles = 0
+
+        data.forEach(item => {
+
+            if (item.ic_front_path) {
+                totalFiles++
+            }
+
+            if (item.ic_back_path) {
+                totalFiles++
+            }
+
+            if (item.bank_slip_path) {
+                totalFiles++
+            }
+
+        })
+
+
+        setPrinted(totalFiles)
+
         setLoadingPrinted(false)
+
     }
+
+    // const loadPrinted = async () => {
+    //     setLoadingPrinted(true)
+
+    //     const now = new Date()
+
+    //     let query = supabase
+    //         .from('submissions')
+    //         .select('*', {
+    //             count: 'exact',
+    //             head: true
+    //         })
+    //         .eq(
+    //             'status',
+    //             'Printed'
+    //         )
+
+
+    //     if (cardPrintSource !== "all") {
+
+    //         query = query.eq(
+    //             'printed_from',
+    //             cardPrintSource
+    //         )
+
+    //     }
+
+
+    //     if (cardRange === "today") {
+
+
+    //         const start = new Date()
+    //         start.setHours(0, 0, 0, 0)
+
+    //         query = query.gte(
+    //             'printed_date',
+    //             start.toISOString()
+    //         )
+
+    //     }
+
+    //     if (cardRange === "yesterday") {
+
+
+    //         const start = new Date()
+    //         start.setDate(start.getDate() - 1)
+    //         start.setHours(0, 0, 0, 0)
+
+    //         const end = new Date(start)
+    //         end.setDate(end.getDate() + 1)
+
+    //         query = query
+    //             .gte(
+    //                 'printed_date',
+    //                 start.toISOString()
+    //             )
+    //             .lt(
+    //                 'printed_date',
+    //                 end.toISOString()
+    //             )
+
+    //     }
+
+    //     if (cardRange === "7days") {
+
+    //         const start = new Date()
+    //         start.setDate(now.getDate() - 7)
+
+    //         query = query.gte(
+    //             'printed_date',
+    //             start.toISOString()
+    //         )
+
+    //     }
+
+
+    //     if (cardRange === "30days") {
+
+
+    //         const start = new Date()
+    //         start.setDate(now.getDate() - 30)
+
+    //         query = query.gte(
+    //             'printed_date',
+    //             start.toISOString()
+    //         )
+
+    //     }
+
+
+    //     if (cardRange === "month") {
+
+
+    //         const start = new Date(
+    //             now.getFullYear(),
+    //             now.getMonth(),
+    //             1
+    //         )
+
+    //         query = query.gte(
+    //             'printed_date',
+    //             start.toISOString()
+    //         )
+
+    //     }
+
+
+    //     if (cardRange === "lastMonth") {
+
+
+    //         const start = new Date(
+    //             now.getFullYear(),
+    //             now.getMonth() - 1,
+    //             1
+    //         )
+
+    //         const end = new Date(
+    //             now.getFullYear(),
+    //             now.getMonth(),
+    //             1
+    //         )
+
+    //         query = query
+    //             .gte(
+    //                 'printed_date',
+    //                 start.toISOString()
+    //             )
+    //             .lt(
+    //                 'printed_date',
+    //                 end.toISOString()
+    //             )
+
+    //     }
+
+
+
+
+    //     const { count, error } = await query
+
+
+    //     if (error) {
+    //         debugError("Load printed error:", error)
+    //         setLoadingPrinted(false)
+    //         return
+    //     }
+
+    //     setPrinted(count || 0)
+    //     setLoadingPrinted(false)
+    // }
 
     const loadChartData = async () => {
 
@@ -458,7 +635,17 @@ function Monitor() {
                 }
 
 
-                grouped[printedDate].printed++
+                if (item.ic_front_path) {
+                    grouped[printedDate].printed++
+                }
+
+                if (item.ic_back_path) {
+                    grouped[printedDate].printed++
+                }
+
+                if (item.bank_slip_path) {
+                    grouped[printedDate].printed++
+                }
 
             }
 
@@ -981,7 +1168,7 @@ function Monitor() {
                     <div className="card-title-row">
 
                         <h2>
-                            Total Printed From
+                            Total Printed Files From
                         </h2>
 
 
@@ -1109,12 +1296,6 @@ function Monitor() {
                                 <ul className="custom-chart-legend">
 
                                     <li>
-                                        <span className="legend-printed">
-                                            ■ Total Printed
-                                        </span>
-                                    </li>
-
-                                    <li>
                                         <span className="legend-uploads">
                                             ■ Total Uploads
                                         </span>
@@ -1126,15 +1307,17 @@ function Monitor() {
                                         </span>
                                     </li>
 
+                                    <li>
+                                        <span className="legend-printed">
+                                            ■ Total Printed Files
+                                        </span>
+                                    </li>
+
                                 </ul>
                             )}
                         />
 
-                        <Bar
-                            dataKey="printed"
-                            name="Total Printed"
-                            fill="#ff7300"
-                        />
+
 
                         <Bar
                             dataKey="uploads"
@@ -1146,6 +1329,12 @@ function Monitor() {
                             dataKey="uploadFiles"
                             name="Total Upload Files"
                             fill="#82ca9d"
+                        />
+
+                        <Bar
+                            dataKey="printed"
+                            name="Total Printed Files"
+                            fill="#ff7300"
                         />
 
                     </BarChart>
