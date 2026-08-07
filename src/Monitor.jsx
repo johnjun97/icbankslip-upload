@@ -1289,7 +1289,17 @@ function Monitor() {
 
                         <YAxis />
 
-                        <Tooltip />
+                        <Tooltip
+                            itemSorter={(item) => {
+                                const order = {
+                                    uploads: 1,
+                                    uploadFiles: 2,
+                                    printed: 3
+                                }
+
+                                return order[item.dataKey] || 99
+                            }}
+                        />
 
                         <Legend
                             content={() => (
