@@ -131,3 +131,88 @@
 .legend-upload-files {
     color: #82ca9d;
 }
+
+@media (max-width: 600px) {
+
+    .monitor-page {
+        padding: 16px;
+    }
+
+    .monitor-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .monitor-header h1 {
+        font-size: 24px;
+    }
+
+    .monitor-header p {
+        font-size: 13px;
+    }
+
+    .monitor-actions {
+        width: 100%;
+    }
+
+    .logout-button {
+        width: 100%;
+    }
+
+
+    /* Cards */
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .monitor-card {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+
+    /* Filters */
+
+    .monitor-filter-row {
+        width: 100%;
+    }
+
+    .filter-select {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+
+    /* Card title + filter */
+
+    .card-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .card-title-row .filter-select {
+        width: 100%;
+    }
+
+
+    /* Chart */
+
+    .chart-card {
+        overflow: hidden;
+    }
+
+    .chart-filters {
+        width: 100%;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .chart-filters .filter-select {
+        width: 100%;
+    }
+
+}
