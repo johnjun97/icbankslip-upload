@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { FaEye, FaEyeSlash } from "react-icons/fa"
-import { supabase } from "./lib/supabase"
+import { supabase } from '../lib/supabase'
 import './MonitorLogin.css'
 
 function MonitorLogin() {
