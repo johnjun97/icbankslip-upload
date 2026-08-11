@@ -1,10 +1,12 @@
 .monitor-page {
-  min-height: 100vh;
-  background-color: #f5f6fa;
-  padding: 40px;
-  box-sizing: border-box;
+    min-height: 100vh;
+    background-color: #f5f6fa;
+    padding: 40px;
+    box-sizing: border-box;
 }
 
+
+/* Header */
 
 .monitor-header {
     display: flex;
@@ -12,42 +14,43 @@
     align-items: center;
 }
 
-
-
 .monitor-header h1 {
-  margin: 0;
+    margin: 0;
 }
 
 
+/* General */
+
 .filter-select {
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: white;
-  font-size: 14px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: white;
+    font-size: 14px;
 }
 
 .monitor-card {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
-
 
 .monitor-card h2 {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 15px;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 15px;
 }
-
 
 .monitor-card p {
-  font-size: 40px;
-  font-weight: bold;
-  margin: 0;
-  color: #2563eb;
+    font-size: 40px;
+    font-weight: bold;
+    margin: 0;
+    color: #2563eb;
 }
+
+
+/* Header actions */
 
 .monitor-actions {
     display: flex;
@@ -55,24 +58,22 @@
     gap: 12px;
 }
 
-
 .logout-button {
     height: 38px;
     padding: 0 18px;
-
     background: #d9534f;
     color: white;
-
     border: none;
     border-radius: 6px;
-
     cursor: pointer;
 }
-
 
 .logout-button:hover {
     background: #c9302c;
 }
+
+
+/* Common card title */
 
 .card-title-row {
     display: flex;
@@ -81,9 +82,8 @@
     gap: 10px;
 }
 
-.printed-card .filter-select {
-    width: auto;
-}
+
+/* Dashboard grid */
 
 .dashboard-grid {
     display: grid;
@@ -91,22 +91,81 @@
     gap: 20px;
 }
 
-.monitor-filter-row {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 25px;
-    margin-bottom: 15px;
-}
 
-.chart-card {
+/* Upload + Print combined card */
+
+.upload-print-card {
     margin-top: 30px;
     box-sizing: border-box;
 }
 
-.chart-filters {
+
+/* Card header */
+
+.upload-print-card .card-title-row {
+    margin-bottom: 25px;
+}
+
+.upload-print-card .card-title-row h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+}
+
+
+/* Filters */
+
+.upload-print-card .chart-filters {
     display: flex;
     gap: 10px;
 }
+
+
+/* Statistics */
+
+.upload-print-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.upload-print-stat {
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f9fafb;
+}
+
+.upload-print-stat .stat-label {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.upload-print-stat .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #222;
+}
+
+
+/* Chart */
+
+.chart-section {
+    border-top: 1px solid #eee;
+    padding-top: 25px;
+}
+
+.chart-section h3 {
+    margin: 0 0 15px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #555;
+}
+
+
+/* Chart legend */
 
 .custom-chart-legend {
     padding: 0;
@@ -131,6 +190,9 @@
 .legend-upload-files {
     color: #82ca9d;
 }
+
+
+/* Mobile */
 
 @media (max-width: 600px) {
 
@@ -161,7 +223,7 @@
     }
 
 
-    /* Cards */
+    /* Dashboard cards */
 
     .dashboard-grid {
         grid-template-columns: 1fr;
@@ -174,45 +236,44 @@
     }
 
 
-    /* Filters */
+    /* Upload + Print card */
 
-    .monitor-filter-row {
-        width: 100%;
-    }
-
-    .filter-select {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-
-    /* Card title + filter */
-
-    .card-title-row {
+    .upload-print-card .card-title-row {
         flex-direction: column;
         align-items: flex-start;
-        gap: 8px;
+        gap: 12px;
     }
 
-    .card-title-row .filter-select {
+    .upload-print-card .chart-filters {
         width: 100%;
+        flex-direction: row;
+    }
+
+    .upload-print-card .chart-filters .filter-select {
+        flex: 1;
+        width: auto;
     }
 
 
-    /* Chart */
+    /* Statistics */
 
-    .chart-card {
-        overflow: hidden;
+    .upload-print-stats {
+        grid-template-columns: 1fr;
+        gap: 10px;
     }
 
-    .chart-filters {
-        width: 100%;
-        flex-direction: column;
-        gap: 8px;
+    .upload-print-stat {
+        padding: 16px;
     }
 
-    .chart-filters .filter-select {
-        width: 100%;
+    .upload-print-stat .stat-value {
+        font-size: 28px;
     }
 
+
+    /* General filters */
+
+    .filter-select {
+        box-sizing: border-box;
+    }
 }

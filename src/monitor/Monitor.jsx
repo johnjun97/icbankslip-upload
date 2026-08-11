@@ -8,8 +8,7 @@ import useMonitorData from './hooks/useMonitorData'
 import useMonitorChart from './hooks/useMonitorChart'
 import MonitorHeader from './components/MonitorHeader'
 import SummaryCards from './components/SummaryCards'
-import StatsCards from './components/StatsCards'
-import StatisticsChart from './components/StatisticsChart'
+import UploadPrintCard from './components/UploadPrintCard'
 
 function Monitor() {
 
@@ -18,23 +17,22 @@ function Monitor() {
         checkingUser
     } = useMonitorAuth()
 
-    const [cardRange, setCardRange] = useState("today")
     const [chartRange, setChartRange] = useState("7days")
     const [printSources, setPrintSources] = useState([])
     const [printSource, setPrintSource] = useState("all")
 
-    const {
-        total,
-        totalUploadFiles,
-        loadingUploadFiles,
-        printed,
-        loadingTotal,
-        loadingPrinted
-    } = useMonitorStats(
-        user,
-        cardRange,
-        printSource
-    )
+const {
+    total,
+    totalUploadFiles,
+    loadingUploadFiles,
+    printed,
+    loadingTotal,
+    loadingPrinted
+} = useMonitorStats(
+    user,
+    chartRange,
+    printSource
+)
 
     const {
         pending,
@@ -117,57 +115,16 @@ function Monitor() {
                 expired={expired}
             />
 
-            <div className="monitor-filter-row">
-
-                <select
-                    className="filter-select"
-                    value={cardRange}
-                    onChange={(e) => setCardRange(e.target.value)}
-                >
-                    <option value="today">
-                        Today
-                    </option>
-
-                    <option value="yesterday">
-                        Yesterday
-                    </option>
-
-                    <option value="7days">
-                        Last 7 Days
-                    </option>
-
-                    <option value="30days">
-                        Last 30 Days
-                    </option>
-
-                    <option value="month">
-                        This Month
-                    </option>
-
-                    <option value="lastMonth">
-                        Last Month
-                    </option>
-
-                    <option value="all">
-                        All Time
-                    </option>
-                </select>
-
-            </div>
-
-            <StatsCards
-                loadingTotal={loadingTotal}
+            <UploadPrintCard
                 total={total}
-                loadingUploadFiles={loadingUploadFiles}
                 totalUploadFiles={totalUploadFiles}
-                loadingPrinted={loadingPrinted}
                 printed={printed}
+                loadingTotal={loadingTotal}
+                loadingUploadFiles={loadingUploadFiles}
+                loadingPrinted={loadingPrinted}
                 printSource={printSource}
                 setPrintSource={setPrintSource}
                 printSources={printSources}
-            />
-
-            <StatisticsChart
                 chartData={chartData}
                 chartRange={chartRange}
                 setChartRange={setChartRange}
