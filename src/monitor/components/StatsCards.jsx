@@ -7,7 +7,9 @@ export default function StatsCards({
     printed,
     cardPrintSource,
     setCardPrintSource,
-    printSources
+    printSources,
+    totalLog,
+    loadingTotalLog
 }) {
 
     return (
@@ -74,6 +76,18 @@ export default function StatsCards({
 
                 <p>
                     {loadingPrinted ? "Loading..." : printed}
+                </p>
+
+            </div>
+
+            <div className="monitor-card">
+
+                <h2>
+                    Total Log
+                </h2>
+
+                <p>
+                    {loadingTotalLog ? "Loading..." : totalLog}
                 </p>
 
             </div>

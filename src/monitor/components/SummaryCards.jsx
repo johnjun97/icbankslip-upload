@@ -2,7 +2,8 @@ export default function SummaryCards({
     loading,
     storageFiles,
     pending,
-    expired
+    expired,
+    totalLog
 }) {
 
     return (
@@ -43,6 +44,18 @@ export default function SummaryCards({
                 </p>
 
             </div>
+
+            <div className="monitor-card">
+
+    <h2>
+        Total Log
+    </h2>
+
+    <p>
+        {loading ? "Loading..." : totalLog}
+    </p>
+
+</div>
 
         </div>
     )

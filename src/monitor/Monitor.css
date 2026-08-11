@@ -87,7 +87,7 @@
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
 }
 
@@ -193,65 +193,105 @@
 
 
 /* Mobile */
-
 @media (max-width: 600px) {
 
     .monitor-page {
-        padding: 16px;
+        padding: 12px;
+        overflow-x: hidden;
     }
 
+
+    /* Header */
+
     .monitor-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
     }
 
     .monitor-header h1 {
-        font-size: 24px;
+        font-size: 20px;
     }
 
     .monitor-header p {
-        font-size: 13px;
+        font-size: 12px;
     }
 
+
+    /* Smaller logout button */
+
     .monitor-actions {
-        width: 100%;
+        width: auto;
     }
 
     .logout-button {
-        width: 100%;
+        width: auto;
+        height: 34px;
+        padding: 0 12px;
+        font-size: 13px;
     }
 
 
-    /* Dashboard cards */
+    /* Summary cards */
 
     .dashboard-grid {
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: 10px;
     }
 
     .monitor-card {
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
         box-sizing: border-box;
+        padding: 16px;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .monitor-card h2 {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .monitor-card p {
+        font-size: 28px;
     }
 
 
     /* Upload + Print card */
 
+    .upload-print-card {
+        margin-top: 20px;
+        overflow: hidden;
+    }
+
     .upload-print-card .card-title-row {
         flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
+        gap: 10px;
+        margin-bottom: 18px;
     }
+
+    .upload-print-card .card-title-row h2 {
+        font-size: 18px;
+    }
+
+
+    /* Filters */
 
     .upload-print-card .chart-filters {
         width: 100%;
-        flex-direction: row;
+        display: flex;
+        gap: 8px;
     }
 
     .upload-print-card .chart-filters .filter-select {
+        width: 50%;
+        min-width: 0;
         flex: 1;
-        width: auto;
+        padding: 9px 8px;
+        font-size: 13px;
     }
 
 
@@ -260,20 +300,47 @@
     .upload-print-stats {
         grid-template-columns: 1fr;
         gap: 10px;
+        margin-bottom: 20px;
     }
 
     .upload-print-stat {
-        padding: 16px;
+        padding: 14px 16px;
+    }
+
+    .upload-print-stat .stat-label {
+        font-size: 12px;
+        margin-bottom: 5px;
     }
 
     .upload-print-stat .stat-value {
-        font-size: 28px;
+        font-size: 26px;
     }
 
 
-    /* General filters */
+    /* Chart */
+
+    .chart-section {
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
+        padding-top: 18px;
+    }
+
+    .chart-section h3 {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .upload-print-card .recharts-responsive-container {
+        width: 100% !important;
+        max-width: 100%;
+    }
+
+
+    /* General */
 
     .filter-select {
         box-sizing: border-box;
+        max-width: 100%;
     }
 }

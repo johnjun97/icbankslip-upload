@@ -34,12 +34,13 @@ const {
     printSource
 )
 
-    const {
-        pending,
-        expired,
-        storageFiles,
-        loadingData
-    } = useMonitorData(user)
+const {
+    pending,
+    expired,
+    storageFiles,
+    totalLog,
+    loadingData
+} = useMonitorData(user)
 
     const {
         chartData
@@ -108,12 +109,13 @@ const {
                 onLogout={logout}
             />
 
-            <SummaryCards
-                loading={loadingData}
-                storageFiles={storageFiles}
-                pending={pending}
-                expired={expired}
-            />
+        <SummaryCards
+    loading={loadingData}
+    storageFiles={storageFiles}
+    pending={pending}
+    expired={expired}
+    totalLog={totalLog}
+/>
 
             <UploadPrintCard
                 total={total}
