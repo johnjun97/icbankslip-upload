@@ -170,13 +170,56 @@ function UploadPrintCard({
                     height={300}
                 >
 
-                    <BarChart data={chartData}>
+               <BarChart
+    data={chartData}
+    margin={{
+        top: 10,
+        right: 20,
+        left: 10,
+        bottom: 35
+    }}
+>
 
                         <CartesianGrid />
 
                         <XAxis
-                            dataKey="date"
-                        />
+    dataKey="date"
+    tick={({ x, y, payload }) => {
+        const date = new Date(payload.value)
+
+        const dateText = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+
+        const dayText = date.toLocaleDateString('en-US', {
+            weekday: 'short'
+        })
+
+        return (
+            <g transform={`translate(${x},${y})`}>
+                <text
+                    x={0}
+                    y={0}
+                    dy={12}
+                    textAnchor="middle"
+                    fill="#666"
+                    fontSize={12}
+                >
+                    {dateText}
+                </text>
+
+                <text
+                    x={0}
+                    y={0}
+                    dy={28}
+                    textAnchor="middle"
+                    fill="#999"
+                    fontSize={11}
+                >
+                    ({dayText})
+                </text>
+            </g>
+        )
+    }}
+/>
 
                         <YAxis />
 
@@ -193,7 +236,11 @@ function UploadPrintCard({
                             }}
                         />
 
-                        <Legend />
+                <Legend
+    wrapperStyle={{
+        paddingTop: 15
+    }}
+/>
 
                         <Bar
                             dataKey="uploads"
