@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import App from './App.jsx'
-import Monitor from './Monitor/Monitor.jsx'
-import MonitorLogin from './Monitor/MonitorLogin.jsx'
+import Monitor from './monitor/Monitor.jsx'
+import MonitorLogin from './monitor/MonitorLogin.jsx'
 
 
 createRoot(document.getElementById('root')).render(
