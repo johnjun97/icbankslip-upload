@@ -21,26 +21,26 @@ function Monitor() {
     const [printSources, setPrintSources] = useState([])
     const [printSource, setPrintSource] = useState("all")
 
-const {
-    total,
-    totalUploadFiles,
-    loadingUploadFiles,
-    printed,
-    loadingTotal,
-    loadingPrinted
-} = useMonitorStats(
-    user,
-    chartRange,
-    printSource
-)
+    const {
+        total,
+        totalUploadFiles,
+        loadingUploadFiles,
+        printed,
+        loadingTotal,
+        loadingPrinted
+    } = useMonitorStats(
+        user,
+        chartRange,
+        printSource
+    )
 
-const {
-    pending,
-    expired,
-    storageFiles,
-    totalLog,
-    loadingData
-} = useMonitorData(user)
+    const {
+        pending,
+        expired,
+        storageFiles,
+        totalLog,
+        loadingData
+    } = useMonitorData(user)
 
     const {
         chartData
@@ -109,13 +109,13 @@ const {
                 onLogout={logout}
             />
 
-        <SummaryCards
-    loading={loadingData}
-    storageFiles={storageFiles}
-    pending={pending}
-    expired={expired}
-    totalLog={totalLog}
-/>
+            <SummaryCards
+                loading={loadingData}
+                storageFiles={storageFiles}
+                pending={pending}
+                expired={expired}
+                totalLog={totalLog}
+            />
 
             <UploadPrintCard
                 total={total}

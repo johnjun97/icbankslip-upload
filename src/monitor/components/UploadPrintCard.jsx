@@ -170,56 +170,56 @@ function UploadPrintCard({
                     height={300}
                 >
 
-               <BarChart
-    data={chartData}
-    margin={{
-        top: 10,
-        right: 20,
-        left: 10,
-        bottom: 35
-    }}
->
+                    <BarChart
+                        data={chartData}
+                        margin={{
+                            top: 10,
+                            right: 20,
+                            left: 10,
+                            bottom: 35
+                        }}
+                    >
 
                         <CartesianGrid />
 
                         <XAxis
-    dataKey="date"
-    tick={({ x, y, payload }) => {
-        const date = new Date(payload.value)
+                            dataKey="date"
+                            tick={({ x, y, payload }) => {
+                                const date = new Date(payload.value)
 
-        const dateText = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+                                const dateText = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
 
-        const dayText = date.toLocaleDateString('en-US', {
-            weekday: 'short'
-        })
+                                const dayText = date.toLocaleDateString('en-US', {
+                                    weekday: 'short'
+                                })
 
-        return (
-            <g transform={`translate(${x},${y})`}>
-                <text
-                    x={0}
-                    y={0}
-                    dy={12}
-                    textAnchor="middle"
-                    fill="#666"
-                    fontSize={12}
-                >
-                    {dateText}
-                </text>
+                                return (
+                                    <g transform={`translate(${x},${y})`}>
+                                        <text
+                                            x={0}
+                                            y={0}
+                                            dy={12}
+                                            textAnchor="middle"
+                                            fill="#666"
+                                            fontSize={12}
+                                        >
+                                            {dateText}
+                                        </text>
 
-                <text
-                    x={0}
-                    y={0}
-                    dy={28}
-                    textAnchor="middle"
-                    fill="#999"
-                    fontSize={11}
-                >
-                    ({dayText})
-                </text>
-            </g>
-        )
-    }}
-/>
+                                        <text
+                                            x={0}
+                                            y={0}
+                                            dy={28}
+                                            textAnchor="middle"
+                                            fill="#999"
+                                            fontSize={11}
+                                        >
+                                            ({dayText})
+                                        </text>
+                                    </g>
+                                )
+                            }}
+                        />
 
                         <YAxis />
 
@@ -236,11 +236,60 @@ function UploadPrintCard({
                             }}
                         />
 
-                <Legend
-    wrapperStyle={{
-        paddingTop: 15
-    }}
-/>
+                        <Legend
+                            verticalAlign="bottom"
+                            wrapperStyle={{
+                                paddingTop: 15
+                            }}
+                            content={() => (
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        gap: "20px"
+                                    }}
+                                >
+                                    <span>
+                                        <span
+                                            style={{
+                                                display: "inline-block",
+                                                width: 10,
+                                                height: 10,
+                                                backgroundColor: "#8884d8",
+                                                marginRight: 5
+                                            }}
+                                        />
+                                        Total Uploads
+                                    </span>
+
+                                    <span>
+                                        <span
+                                            style={{
+                                                display: "inline-block",
+                                                width: 10,
+                                                height: 10,
+                                                backgroundColor: "#82ca9d",
+                                                marginRight: 5
+                                            }}
+                                        />
+                                        Total Upload Files
+                                    </span>
+
+                                    <span>
+                                        <span
+                                            style={{
+                                                display: "inline-block",
+                                                width: 10,
+                                                height: 10,
+                                                backgroundColor: "#ff7300",
+                                                marginRight: 5
+                                            }}
+                                        />
+                                        Total Printed Files
+                                    </span>
+                                </div>
+                            )}
+                        />
 
                         <Bar
                             dataKey="uploads"
