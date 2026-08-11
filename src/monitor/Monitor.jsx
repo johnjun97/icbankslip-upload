@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import useMonitorAuth from './hooks/useMonitorAuth'
 import { supabase } from '../lib/supabase'
 import './Monitor.css'
+import { debugError } from '../lib/debug'
 import useMonitorStats from './hooks/useMonitorStats'
 import useMonitorData from './hooks/useMonitorData'
 import useMonitorChart from './hooks/useMonitorChart'
@@ -22,8 +23,6 @@ function Monitor() {
     const [printSources, setPrintSources] = useState([])
     const [printSource, setPrintSource] = useState("all")
 
-    const [chartData, setChartData] = useState([])
-
     const {
         total,
         totalUploadFiles,
@@ -43,6 +42,14 @@ function Monitor() {
         storageFiles,
         loadingData
     } = useMonitorData(user)
+
+    const {
+        chartData
+    } = useMonitorChart(
+        user,
+        chartRange,
+        printSource
+    )
 
     const loadPrintSources = async () => {
 
@@ -164,8 +171,6 @@ function Monitor() {
                 chartData={chartData}
                 chartRange={chartRange}
                 setChartRange={setChartRange}
-                printSource={printSource}
-                printSources={printSources}
             />
 
         </div>

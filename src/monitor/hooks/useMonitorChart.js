@@ -12,6 +12,49 @@ export default function useMonitorChart(
 
     const loadChartData = async () => {
 
+        const now = new Date()
+
+        let startDate = new Date()
+        let endDate = new Date(now)
+
+        if (chartRange === "7days") {
+
+            startDate.setDate(now.getDate() - 7)
+
+        }
+
+        if (chartRange === "30days") {
+
+            startDate.setDate(now.getDate() - 30)
+
+        }
+
+        if (chartRange === "month") {
+
+            startDate = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                1
+            )
+
+        }
+
+        if (chartRange === "lastMonth") {
+
+            startDate = new Date(
+                now.getFullYear(),
+                now.getMonth() - 1,
+                1
+            )
+
+            endDate = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                1
+            )
+
+        }
+
         let query = supabase
             .from('submissions')
             .select(`
@@ -24,69 +67,30 @@ export default function useMonitorChart(
                 bank_slip_path
             `)
 
-        const now = new Date()
+        /*
+         * Get submissions that were either:
+         *
+         * 1. Uploaded during the selected period
+         * OR
+         * 2. Printed during the selected period
+         *
+         * This is important because upload date and print date
+         * can be different.
+         */
 
-        if (chartRange === "7days") {
+        if (chartRange !== "all") {
 
-            const start = new Date()
-            start.setDate(now.getDate() - 7)
-
-            query = query.gte(
-                'created_at',
-                start.toISOString()
-            )
-
-        }
-
-        if (chartRange === "30days") {
-
-            const start = new Date()
-            start.setDate(now.getDate() - 30)
-
-            query = query.gte(
-                'created_at',
-                start.toISOString()
-            )
-
-        }
-
-        if (chartRange === "month") {
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            )
-
-            query = query.gte(
-                'created_at',
-                start.toISOString()
+            query = query.or(
+                `created_at.gte.${startDate.toISOString()},printed_date.gte.${startDate.toISOString()}`
             )
 
         }
 
         if (chartRange === "lastMonth") {
 
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth() - 1,
-                1
-            )
-
-            const end = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            )
-
             query = query
-                .gte(
-                    'created_at',
-                    start.toISOString()
-                )
-                .lt(
-                    'created_at',
-                    end.toISOString()
+                .or(
+                    `created_at.lt.${endDate.toISOString()},printed_date.lt.${endDate.toISOString()}`
                 )
 
         }
@@ -94,80 +98,104 @@ export default function useMonitorChart(
         const { data, error } = await query
 
         if (error) {
+
             debugError(
                 "Load chart data error:",
                 error
             )
+
             return
         }
 
         const grouped = {}
 
-        const startDate = new Date()
+        /*
+         * Create empty dates
+         */
 
-        if (chartRange === "7days") {
-            startDate.setDate(now.getDate() - 7)
-        }
+        if (chartRange !== "all") {
 
-        if (chartRange === "30days") {
-            startDate.setDate(now.getDate() - 30)
-        }
+            for (
+                let date = new Date(startDate);
+                date < endDate;
+                date.setDate(date.getDate() + 1)
+            ) {
 
-        if (chartRange === "month") {
-            startDate.setDate(1)
-        }
+                const dateString =
+                    date.toLocaleDateString()
 
-        if (chartRange === "lastMonth") {
-            startDate.setMonth(now.getMonth() - 1)
-            startDate.setDate(1)
-        }
-
-        // Create empty dates
-        for (
-            let date = new Date(startDate);
-            date <= now;
-            date.setDate(date.getDate() + 1)
-        ) {
-
-            const dateString = date.toLocaleDateString()
-
-            grouped[dateString] = {
-                date: dateString,
-                uploads: 0,
-                uploadFiles: 0,
-                printed: 0
-            }
-
-        }
-
-        data.forEach(item => {
-
-            const uploadDate = new Date(
-                item.created_at
-            ).toLocaleDateString()
-
-            if (!grouped[uploadDate]) {
-                grouped[uploadDate] = {
-                    date: uploadDate,
+                grouped[dateString] = {
+                    date: dateString,
                     uploads: 0,
                     uploadFiles: 0,
                     printed: 0
                 }
+
             }
 
-            grouped[uploadDate].uploads++
+        }
 
-            if (item.ic_front_path) {
-                grouped[uploadDate].uploadFiles++
+        /*
+         * Process submissions
+         */
+
+        data.forEach(item => {
+
+            /*
+             * UPLOAD STATISTICS
+             */
+
+            if (item.created_at) {
+
+                const uploadDate =
+                    new Date(
+                        item.created_at
+                    )
+
+                const uploadDateString =
+                    uploadDate.toLocaleDateString()
+
+                const uploadInRange =
+                    chartRange === "all" ||
+                    (
+                        uploadDate >= startDate &&
+                        uploadDate < endDate
+                    )
+
+                if (uploadInRange) {
+
+                    if (!grouped[uploadDateString]) {
+
+                        grouped[uploadDateString] = {
+                            date: uploadDateString,
+                            uploads: 0,
+                            uploadFiles: 0,
+                            printed: 0
+                        }
+
+                    }
+
+                    grouped[uploadDateString].uploads++
+
+                    if (item.ic_front_path) {
+                        grouped[uploadDateString].uploadFiles++
+                    }
+
+                    if (item.ic_back_path) {
+                        grouped[uploadDateString].uploadFiles++
+                    }
+
+                    if (item.bank_slip_path) {
+                        grouped[uploadDateString].uploadFiles++
+                    }
+
+                }
+
             }
 
-            if (item.ic_back_path) {
-                grouped[uploadDate].uploadFiles++
-            }
-
-            if (item.bank_slip_path) {
-                grouped[uploadDate].uploadFiles++
-            }
+            /*
+             * PRINT STATISTICS
+             */
 
             if (
                 item.status === "Printed" &&
@@ -178,38 +206,61 @@ export default function useMonitorChart(
                 )
             ) {
 
-                const printedDate = new Date(
-                    item.printed_date
-                ).toLocaleDateString()
+                const printedDate =
+                    new Date(
+                        item.printed_date
+                    )
 
-                if (!grouped[printedDate]) {
-                    grouped[printedDate] = {
-                        date: printedDate,
-                        uploads: 0,
-                        uploadFiles: 0,
-                        printed: 0
+                const printedDateString =
+                    printedDate.toLocaleDateString()
+
+                const printedInRange =
+                    chartRange === "all" ||
+                    (
+                        printedDate >= startDate &&
+                        printedDate < endDate
+                    )
+
+                if (printedInRange) {
+
+                    if (!grouped[printedDateString]) {
+
+                        grouped[printedDateString] = {
+                            date: printedDateString,
+                            uploads: 0,
+                            uploadFiles: 0,
+                            printed: 0
+                        }
+
                     }
-                }
 
-                if (item.ic_front_path) {
-                    grouped[printedDate].printed++
-                }
+                    if (item.ic_front_path) {
+                        grouped[printedDateString].printed++
+                    }
 
-                if (item.ic_back_path) {
-                    grouped[printedDate].printed++
-                }
+                    if (item.ic_back_path) {
+                        grouped[printedDateString].printed++
+                    }
 
-                if (item.bank_slip_path) {
-                    grouped[printedDate].printed++
+                    if (item.bank_slip_path) {
+                        grouped[printedDateString].printed++
+                    }
+
                 }
 
             }
 
         })
 
+        /*
+         * Sort chart dates
+         */
+
         setChartData(
             Object.values(grouped).sort(
-                (a, b) => new Date(a.date) - new Date(b.date)
+                (a, b) =>
+                    new Date(a.date) -
+                    new Date(b.date)
             )
         )
 
@@ -221,7 +272,11 @@ export default function useMonitorChart(
             loadChartData()
         }
 
-    }, [chartRange, printSource, user])
+    }, [
+        chartRange,
+        printSource,
+        user
+    ])
 
     useEffect(() => {
 
@@ -239,9 +294,14 @@ export default function useMonitorChart(
 
         return () => clearInterval(interval)
 
-    }, [user, chartRange, printSource])
+    }, [
+        user,
+        chartRange,
+        printSource
+    ])
 
     return {
         chartData
     }
+
 }

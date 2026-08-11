@@ -12,10 +12,7 @@ import {
 function StatisticsChart({
     chartData,
     chartRange,
-    setChartRange,
-    chartPrintSource,
-    setChartPrintSource,
-    printSources
+    setChartRange
 }) {
 
     return (
@@ -31,29 +28,10 @@ function StatisticsChart({
 
                     <select
                         className="filter-select"
-                        value={chartPrintSource}
-                        onChange={(e) => setChartPrintSource(e.target.value)}
-                    >
-
-                        <option value="all">
-                            All Sources
-                        </option>
-
-                        {printSources.map((source) => (
-                            <option
-                                key={source}
-                                value={source}
-                            >
-                                {source}
-                            </option>
-                        ))}
-
-                    </select>
-
-                    <select
-                        className="filter-select"
                         value={chartRange}
-                        onChange={(e) => setChartRange(e.target.value)}
+                        onChange={(e) =>
+                            setChartRange(e.target.value)
+                        }
                     >
 
                         <option value="7days">
@@ -99,6 +77,7 @@ function StatisticsChart({
 
                     <Tooltip
                         itemSorter={(item) => {
+
                             const order = {
                                 uploads: 1,
                                 uploadFiles: 2,
