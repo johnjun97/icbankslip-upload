@@ -24,7 +24,7 @@ export default function SummaryCards({
             <div className="monitor-card">
 
                 <h2>
-                    Pending
+                    Pending Log
                 </h2>
 
                 <p>
