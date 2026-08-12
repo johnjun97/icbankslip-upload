@@ -61,14 +61,36 @@ export default function useMonitorStats(
                     'created_at',
                     end.toISOString()
                 )
-
         }
-
 
         if (cardRange === "7days") {
 
-            const start = new Date()
-            start.setDate(now.getDate() - 7)
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() - 6
+            )
+
+            query = query
+                .gte(
+                    'created_at',
+                    start.toISOString()
+                )
+        }
+
+        if (cardRange === "thisweek") {
+
+            const day = now.getDay()
+
+            const mondayOffset = day === 0
+                ? -6
+                : 1 - day
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + mondayOffset
+            )
 
             query = query.gte(
                 'created_at',
@@ -78,15 +100,35 @@ export default function useMonitorStats(
         }
 
 
-        if (cardRange === "30days") {
+        if (cardRange === "lastweek") {
 
-            const start = new Date()
-            start.setDate(now.getDate() - 30)
+            const day = now.getDay()
 
-            query = query.gte(
-                'created_at',
-                start.toISOString()
+            const mondayOffset = day === 0
+                ? -6
+                : 1 - day
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + mondayOffset - 7
             )
+
+            const end = new Date(
+                start.getFullYear(),
+                start.getMonth(),
+                start.getDate() + 7
+            )
+
+            query = query
+                .gte(
+                    'created_at',
+                    start.toISOString()
+                )
+                .lt(
+                    'created_at',
+                    end.toISOString()
+                )
 
         }
 
@@ -190,23 +232,57 @@ export default function useMonitorStats(
 
         }
 
-
         if (cardRange === "7days") {
 
-            const start = new Date()
-            start.setDate(now.getDate() - 7)
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() - 6
+            )
+            startDate = start.toISOString()
+        }
+
+        if (cardRange === "thisweek") {
+
+            const day = now.getDay()
+
+            const mondayOffset = day === 0
+                ? -6
+                : 1 - day
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + mondayOffset
+            )
 
             startDate = start.toISOString()
 
         }
 
 
-        if (cardRange === "30days") {
+        if (cardRange === "lastweek") {
 
-            const start = new Date()
-            start.setDate(now.getDate() - 30)
+            const day = now.getDay()
+
+            const mondayOffset = day === 0
+                ? -6
+                : 1 - day
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + mondayOffset - 7
+            )
+
+            const end = new Date(
+                start.getFullYear(),
+                start.getMonth(),
+                start.getDate() + 7
+            )
 
             startDate = start.toISOString()
+            endDate = end.toISOString()
 
         }
 
@@ -337,11 +413,36 @@ export default function useMonitorStats(
 
         }
 
-
         if (cardRange === "7days") {
 
-            const start = new Date()
-            start.setDate(now.getDate() - 7)
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() - 6
+            )
+
+            query = query
+                .gte(
+                    'printed_date',
+                    start.toISOString()
+                )
+
+        }
+
+
+        if (cardRange === "thisweek") {
+
+            const day = now.getDay()
+
+            const mondayOffset = day === 0
+                ? -6
+                : 1 - day
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + mondayOffset
+            )
 
             query = query.gte(
                 'printed_date',
@@ -351,15 +452,35 @@ export default function useMonitorStats(
         }
 
 
-        if (cardRange === "30days") {
+        if (cardRange === "lastweek") {
 
-            const start = new Date()
-            start.setDate(now.getDate() - 30)
+            const day = now.getDay()
 
-            query = query.gte(
-                'printed_date',
-                start.toISOString()
+            const mondayOffset = day === 0
+                ? -6
+                : 1 - day
+
+            const start = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + mondayOffset - 7
             )
+
+            const end = new Date(
+                start.getFullYear(),
+                start.getMonth(),
+                start.getDate() + 7
+            )
+
+            query = query
+                .gte(
+                    'printed_date',
+                    start.toISOString()
+                )
+                .lt(
+                    'printed_date',
+                    end.toISOString()
+                )
 
         }
 
