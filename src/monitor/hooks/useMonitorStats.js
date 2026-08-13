@@ -5,7 +5,8 @@ import { debugError } from '../../lib/debug'
 export default function useMonitorStats(
     user,
     cardRange,
-    cardPrintSource
+    cardPrintSource,
+    refreshTrigger
 ) {
 
     const [total, setTotal] = useState(null)
@@ -578,18 +579,12 @@ useEffect(() => {
     loadTotalUploadFiles()
     loadPrinted()
 
-    // Refresh all stats every 60 seconds
-    const interval = setInterval(() => {
-        loadTotalUploads()
-        loadTotalUploadFiles()
-        loadPrinted()
-    }, 60000)
-
-    return () => {
-        clearInterval(interval)
-    }
-
-}, [cardRange, cardPrintSource, user])
+}, [
+    user,
+    cardRange,
+    cardPrintSource,
+    refreshTrigger
+])
 
 
     return {

@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { debugError } from '../../lib/debug'
 
-export default function useMonitorData(user) {
+export default function useMonitorData(
+    user,
+    refreshTrigger
+) {
 
     const [pending, setPending] = useState(null)
     const [expired, setExpired] = useState(null)
@@ -129,16 +132,7 @@ export default function useMonitorData(user) {
 
         loadData()
 
-        // Refresh data every 60 seconds
-        const interval = setInterval(() => {
-            loadData()
-        }, 60000)
-
-        return () => {
-            clearInterval(interval)
-        }
-
-    }, [user])
+    }, [user, refreshTrigger])
 
 
     return {

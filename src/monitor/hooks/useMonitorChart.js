@@ -5,7 +5,8 @@ import { debugError } from '../../lib/debug'
 export default function useMonitorChart(
     user,
     chartRange,
-    printSource
+    printSource,
+    refreshTrigger
 ) {
 
     const [chartData, setChartData] = useState([])
@@ -357,49 +358,18 @@ export default function useMonitorChart(
 
     }
 
-
     useEffect(() => {
 
-        if (!user) return
+    if (!user) return
 
-        loadChartData()
+    loadChartData()
 
-    }, [
-        user,
-        chartRange,
-        printSource
-    ])
-
-
-    /*
-     * Auto refresh every 5 minutes
-     */
-
-    useEffect(() => {
-
-        if (!user) return
-
-        const interval =
-            setInterval(() => {
-
-                console.log(
-                    `[Monitor] Re-fetching chart data at ${new Date().toLocaleTimeString()}`
-                )
-
-                loadChartData()
-
-            }, 5 * 60 * 1000)
-
-
-        return () =>
-            clearInterval(interval)
-
-    }, [
-        user,
-        chartRange,
-        printSource
-    ])
-
+}, [
+    user,
+    chartRange,
+    printSource,
+    refreshTrigger
+])
 
     return {
         chartData

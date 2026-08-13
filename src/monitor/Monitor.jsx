@@ -22,19 +22,39 @@ function Monitor() {
     const [chartRange, setChartRange] = useState("today")
     const [printSources, setPrintSources] = useState([])
     const [printSource, setPrintSource] = useState("all")
+    const [refreshTrigger, setRefreshTrigger] = useState(0)
 
-    const {
-        total,
-        totalUploadFiles,
-        loadingUploadFiles,
-        printed,
-        loadingTotal,
-        loadingPrinted
-    } = useMonitorStats(
-        user,
-        chartRange,
-        printSource
-    )
+    useEffect(() => {
+
+    const interval = setInterval(() => {
+
+        console.log(
+            `[Monitor] Refreshing all data at ${new Date().toLocaleTimeString()}`
+        )
+
+        setRefreshTrigger(prev => prev + 1)
+
+    }, 60000)
+
+    return () => {
+        clearInterval(interval)
+    }
+
+}, [])
+
+const {
+    total,
+    totalUploadFiles,
+    loadingUploadFiles,
+    printed,
+    loadingTotal,
+    loadingPrinted
+} = useMonitorStats(
+    user,
+    chartRange,
+    printSource,
+    refreshTrigger
+)
 
     const {
         pending,
@@ -43,15 +63,19 @@ function Monitor() {
         totalLog,
         loadingData,
         lastUpdated
-    } = useMonitorData(user)
+    } = useMonitorData(
+    user,
+    refreshTrigger
+)
 
     const {
         chartData
     } = useMonitorChart(
-        user,
-        chartRange,
-        printSource
-    )
+    user,
+    chartRange,
+    printSource,
+    refreshTrigger
+)
 
     const loadPrintSources = async () => {
 
