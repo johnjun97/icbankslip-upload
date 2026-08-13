@@ -570,23 +570,26 @@ export default function useMonitorStats(
     }
 
 
-    useEffect(() => {
+useEffect(() => {
 
-        if (!user) return
+    if (!user) return
 
+    loadTotalUploads()
+    loadTotalUploadFiles()
+    loadPrinted()
+
+    // Refresh all stats every 60 seconds
+    const interval = setInterval(() => {
         loadTotalUploads()
         loadTotalUploadFiles()
-
-    }, [cardRange, user])
-
-
-    useEffect(() => {
-
-        if (!user) return
-
         loadPrinted()
+    }, 60000)
 
-    }, [cardRange, cardPrintSource, user])
+    return () => {
+        clearInterval(interval)
+    }
+
+}, [cardRange, cardPrintSource, user])
 
 
     return {

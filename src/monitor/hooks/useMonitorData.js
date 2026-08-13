@@ -52,22 +52,22 @@ export default function useMonitorData(user) {
             await getSystemStatusCount("Expired")
         )
 
-            // Total number of submission logs
-    const { count, error: totalLogError } = await supabase
-        .from('submissions')
-        .select('*', {
-            count: 'exact',
-            head: true
-        })
+        // Total number of submission logs
+        const { count, error: totalLogError } = await supabase
+            .from('submissions')
+            .select('*', {
+                count: 'exact',
+                head: true
+            })
 
-    if (totalLogError) {
-        debugError(
-            "Load total log count error:",
-            totalLogError
-        )
-    }
+        if (totalLogError) {
+            debugError(
+                "Load total log count error:",
+                totalLogError
+            )
+        }
 
-    setTotalLog(count || 0)
+        setTotalLog(count || 0)
 
 
         const countStorageFiles = async () => {
@@ -114,11 +114,11 @@ export default function useMonitorData(user) {
 
         const files = await countStorageFiles()
 
-setStorageFiles(files)
+        setStorageFiles(files)
 
-setLastUpdated(new Date())
+        setLastUpdated(new Date())
 
-setLoadingData(false)
+        setLoadingData(false)
 
     }
 
@@ -129,16 +129,25 @@ setLoadingData(false)
 
         loadData()
 
+        // Refresh data every 60 seconds
+        const interval = setInterval(() => {
+            loadData()
+        }, 60000)
+
+        return () => {
+            clearInterval(interval)
+        }
+
     }, [user])
 
 
-return {
-    pending,
-    expired,
-    storageFiles,
-    totalLog,
-    loadingData,
-    lastUpdated
-}
+    return {
+        pending,
+        expired,
+        storageFiles,
+        totalLog,
+        loadingData,
+        lastUpdated
+    }
 
 }
