@@ -17,7 +17,9 @@ function Monitor() {
         checkingUser
     } = useMonitorAuth()
 
-    const [chartRange, setChartRange] = useState("7days")
+
+    // default time filter
+    const [chartRange, setChartRange] = useState("today")
     const [printSources, setPrintSources] = useState([])
     const [printSource, setPrintSource] = useState("all")
 
@@ -39,7 +41,8 @@ function Monitor() {
         expired,
         storageFiles,
         totalLog,
-        loadingData
+        loadingData,
+        lastUpdated
     } = useMonitorData(user)
 
     const {
@@ -106,6 +109,7 @@ function Monitor() {
 
             <MonitorHeader
                 email={user.email}
+                lastUpdated={lastUpdated}
                 onLogout={logout}
             />
 

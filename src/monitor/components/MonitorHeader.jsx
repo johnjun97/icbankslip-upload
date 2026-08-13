@@ -1,4 +1,4 @@
-export default function MonitorHeader({ email, onLogout }) {
+export default function MonitorHeader({ email, lastUpdated, onLogout }) {
 
     return (
         <div className="monitor-header">
@@ -9,8 +9,19 @@ export default function MonitorHeader({ email, onLogout }) {
                 </h1>
 
                 <p>
-                    {email}
-                </p>
+    {email}
+
+    {lastUpdated && (
+        <span>
+            {" "}updated as {lastUpdated.toLocaleTimeString([], {
+                hour: 'numeric',
+                minute: '2-digit'
+            })}
+        </span>
+    )}
+</p>
+
+
             </div>
 
             <div className="monitor-actions">

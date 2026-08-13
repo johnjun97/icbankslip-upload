@@ -9,6 +9,7 @@ export default function useMonitorData(user) {
     const [storageFiles, setStorageFiles] = useState(null)
     const [loadingData, setLoadingData] = useState(true)
     const [totalLog, setTotalLog] = useState(null)
+    const [lastUpdated, setLastUpdated] = useState(null)
 
     const loadData = async () => {
 
@@ -113,9 +114,11 @@ export default function useMonitorData(user) {
 
         const files = await countStorageFiles()
 
-        setStorageFiles(files)
+setStorageFiles(files)
 
-        setLoadingData(false)
+setLastUpdated(new Date())
+
+setLoadingData(false)
 
     }
 
@@ -134,7 +137,8 @@ return {
     expired,
     storageFiles,
     totalLog,
-    loadingData
+    loadingData,
+    lastUpdated
 }
 
 }
