@@ -138,14 +138,28 @@ function App() {
 
       debugError("Upload error:", error)
 
-      setUploadStatus(
-        `Upload Error: ${error.message}`
-      )
-
-      return null
+      throw error
     }
 
     return data.path
+  }
+
+  const deleteUploadedFiles = async (paths) => {
+    const validPaths = Object.values(paths).filter(Boolean)
+
+    if (validPaths.length === 0) return
+
+    debugLog("Cleaning up uploaded files:", validPaths)
+
+    const { data, error } = await supabase.storage
+      .from('uploads')
+      .remove(validPaths)
+
+    debugLog("Cleanup response:", data, error)
+
+    if (error) {
+      debugError("Cleanup error:", error)
+    }
   }
 
   const removeFile = (fileName) => {
@@ -171,6 +185,8 @@ function App() {
 
 
     setLoading(true)
+
+    const uploadResult = {}
 
     try {
 
@@ -202,9 +218,6 @@ function App() {
           file: files.bankSlip.file
         })
       }
-
-
-      const uploadResult = {}
 
       for (let i = 0; i < uploadList.length; i++) {
 
@@ -242,6 +255,10 @@ function App() {
 
         debugError("Database insert error:", error)
 
+        // Database insert failed, so remove the files
+        // that were already uploaded to Storage.
+        await deleteUploadedFiles(uploadResult)
+
         setUploadStatus(
           `Database Error: ${error.message}`
         )
@@ -255,6 +272,10 @@ function App() {
     } catch (error) {
 
       debugError("Submit error:", error)
+
+      // Clean up any files that were successfully uploaded
+      // before the error occurred.
+      await deleteUploadedFiles(uploadResult)
 
       setUploadStatus(
         `Error: ${error.message}`
