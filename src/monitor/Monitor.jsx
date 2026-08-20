@@ -9,6 +9,7 @@ import useMonitorChart from './hooks/useMonitorChart'
 import MonitorHeader from './components/MonitorHeader'
 import SummaryCards from './components/SummaryCards'
 import UploadPrintCard from './components/UploadPrintCard'
+import packageInfo from '../../package.json'
 
 function Monitor() {
 
@@ -131,11 +132,12 @@ const {
     return (
         <div className="monitor-page">
 
-            <MonitorHeader
-                email={user.email}
-                lastUpdated={lastUpdated}
-                onLogout={logout}
-            />
+   <MonitorHeader
+    email={user.email}
+    lastUpdated={lastUpdated}
+    onLogout={logout}
+    version={packageInfo.version}
+/>
 
             <SummaryCards
                 loading={loadingData}

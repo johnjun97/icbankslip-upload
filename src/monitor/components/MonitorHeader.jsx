@@ -1,25 +1,25 @@
-export default function MonitorHeader({ email, lastUpdated, onLogout }) {
+export default function MonitorHeader({ email, lastUpdated, onLogout, version }) {
 
     return (
         <div className="monitor-header">
 
             <div>
                 <h1>
-                    Kiosk Monitor
+                    Kiosk Monitor <span className="monitor-version">v{version}</span>
                 </h1>
 
                 <p>
-    {email}
+                    {email}
 
-    {lastUpdated && (
-        <span>
-            {" "}updated as {lastUpdated.toLocaleTimeString([], {
-                hour: 'numeric',
-                minute: '2-digit'
-            })}
-        </span>
-    )}
-</p>
+                    {lastUpdated && (
+                        <span>
+                            {" "}updated as {lastUpdated.toLocaleTimeString([], {
+                                hour: 'numeric',
+                                minute: '2-digit'
+                            })}
+                        </span>
+                    )}
+                </p>
 
 
             </div>
