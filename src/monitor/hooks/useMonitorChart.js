@@ -11,6 +11,23 @@ export default function useMonitorChart(
 
     const [chartData, setChartData] = useState([])
 
+    const getBankSlipCount = (item) => {
+
+        let count = 0
+
+        // Old format
+        if (item.bank_slip_path) {
+            count++
+        }
+
+        // New format
+        if (Array.isArray(item.bank_slip_paths)) {
+            count += item.bank_slip_paths.length
+        }
+
+        return count
+    }
+
     const loadChartData = async () => {
 
         const { data, error } = await supabase
@@ -22,7 +39,8 @@ export default function useMonitorChart(
                 printed_from,
                 ic_front_path,
                 ic_back_path,
-                bank_slip_path
+                bank_slip_path,
+                bank_slip_paths
             `)
 
         if (error) {
@@ -272,9 +290,7 @@ export default function useMonitorChart(
                     grouped[dateString].uploadFiles++
                 }
 
-                if (item.bank_slip_path) {
-                    grouped[dateString].uploadFiles++
-                }
+                grouped[dateString].uploadFiles += getBankSlipCount(item)
 
             }
 
@@ -331,9 +347,7 @@ export default function useMonitorChart(
                         grouped[dateString].printed++
                     }
 
-                    if (item.bank_slip_path) {
-                        grouped[dateString].printed++
-                    }
+                    grouped[dateString].printed += getBankSlipCount(item)
 
                 }
 
@@ -360,16 +374,16 @@ export default function useMonitorChart(
 
     useEffect(() => {
 
-    if (!user) return
+        if (!user) return
 
-    loadChartData()
+        loadChartData()
 
-}, [
-    user,
-    chartRange,
-    printSource,
-    refreshTrigger
-])
+    }, [
+        user,
+        chartRange,
+        printSource,
+        refreshTrigger
+    ])
 
     return {
         chartData

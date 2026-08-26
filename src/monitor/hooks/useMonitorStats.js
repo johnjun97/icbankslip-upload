@@ -359,11 +359,12 @@ export default function useMonitorStats(
 
         let query = supabase
             .from('submissions')
-            .select(`
+            .select(`  
                 ic_front_path,
                 ic_back_path,
-                bank_slip_path
-            `)
+                bank_slip_path,
+                bank_slip_paths
+                `)
             .eq(
                 'status',
                 'Printed'
@@ -557,9 +558,13 @@ export default function useMonitorStats(
                 totalFiles++
             }
 
-            if (item.bank_slip_path) {
-                totalFiles++
-            }
+if (item.bank_slip_path) {
+    totalFiles++
+}
+
+if (Array.isArray(item.bank_slip_paths)) {
+    totalFiles += item.bank_slip_paths.length
+}
 
         })
 
@@ -571,20 +576,20 @@ export default function useMonitorStats(
     }
 
 
-useEffect(() => {
+    useEffect(() => {
 
-    if (!user) return
+        if (!user) return
 
-    loadTotalUploads()
-    loadTotalUploadFiles()
-    loadPrinted()
+        loadTotalUploads()
+        loadTotalUploadFiles()
+        loadPrinted()
 
-}, [
-    user,
-    cardRange,
-    cardPrintSource,
-    refreshTrigger
-])
+    }, [
+        user,
+        cardRange,
+        cardPrintSource,
+        refreshTrigger
+    ])
 
 
     return {

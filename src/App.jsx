@@ -51,30 +51,18 @@ function App() {
   const [files, setFiles] = useState({
     icFront: null,
     icBack: null,
-    bankSlip: null
+    bankSlip: []
   })
 
   const handleFileChange = (e, fileName) => {
 
-    const file = e.target.files[0]
+    const selectedFiles = Array.from(e.target.files)
 
-    if (!file) return
+    if (selectedFiles.length === 0) return
 
-
-    // Maximum file size
     const MAX_SIZE = 5 * 1024 * 1024 // 5MB
 
-
-    if (file.size > MAX_SIZE) {
-      alert("File size cannot exceed 5MB")
-      e.target.value = ""
-      return
-    }
-
-
-    // Allowed formats
     const allowedTypes = {
-
       icFront: [
         "image/jpeg",
         "image/png"
@@ -90,31 +78,61 @@ function App() {
         "image/png",
         "application/pdf"
       ]
-
     }
 
+    for (const file of selectedFiles) {
 
-    if (!allowedTypes[fileName].includes(file.type)) {
-
-      alert("Unsupported file format")
-      e.target.value = ""
-      return
-
-    }
-
-
-    setFiles(prev => ({
-      ...prev,
-      [fileName]: {
-        file: file,
-        preview: URL.createObjectURL(file)
+      if (file.size > MAX_SIZE) {
+        alert(`${file.name}: File size cannot exceed 5MB`)
+        e.target.value = ""
+        return
       }
-    }))
+
+      if (!allowedTypes[fileName].includes(file.type)) {
+        alert(`${file.name}: Unsupported file format`)
+        e.target.value = ""
+        return
+      }
+    }
+
+    if (fileName === "bankSlip") {
+
+      const newFiles = selectedFiles.map(file => ({
+        file,
+        preview: URL.createObjectURL(file)
+      }))
+
+      setFiles(prev => ({
+        ...prev,
+        bankSlip: [
+          ...prev.bankSlip,
+          ...newFiles
+        ]
+      }))
+
+    } else {
+
+      const file = selectedFiles[0]
+
+      setFiles(prev => ({
+        ...prev,
+        [fileName]: {
+          file,
+          preview: URL.createObjectURL(file)
+        }
+      }))
+    }
+
+    e.target.value = ""
   }
 
   const canSubmit = () => {
     return (
-      (files.icFront || files.icBack || files.bankSlip) &&
+      (
+        files.icFront ||
+        files.icBack ||
+        files.bankSlip.length > 0
+      ) &&
       agree &&
       !loading
     )
@@ -171,7 +189,12 @@ function App() {
   }
 
   const deleteUploadedFiles = async (paths) => {
-    const validPaths = Object.values(paths).filter(Boolean)
+
+    const validPaths = [
+      paths.icFront,
+      paths.icBack,
+      ...(paths.bankSlips || [])
+    ].filter(Boolean)
 
     if (validPaths.length === 0) return
 
@@ -191,7 +214,25 @@ function App() {
     }
   }
 
-  const removeFile = (fileName) => {
+  const removeFile = (fileName, index = null) => {
+
+    if (fileName === "bankSlip") {
+
+      const file = files.bankSlip[index]
+
+      if (file?.preview) {
+        URL.revokeObjectURL(file.preview)
+      }
+
+      setFiles(prev => ({
+        ...prev,
+        bankSlip: prev.bankSlip.filter(
+          (_, i) => i !== index
+        )
+      }))
+
+      return
+    }
 
     if (files[fileName]?.preview) {
       URL.revokeObjectURL(files[fileName].preview)
@@ -205,401 +246,418 @@ function App() {
 
   const handleSubmit = async (e) => {
 
-  e.preventDefault()
+    e.preventDefault()
 
-  if (import.meta.env.VITE_DEBUG === "true") {
-    const { data } = await supabase.auth.getSession()
-    debugLog("User logged in:", data.session?.user?.email)
-  }
-
-  setLoading(true)
-
-  const uploadResult = {}
-  const qrValue = `NIR-${Date.now()}`
-
-  try {
-
-    await logUploadEvent({
-      qrcode: qrValue,
-      event: "SUBMIT_STARTED"
-    })
-
-    const uploadList = []
-
-    if (files.icFront) {
-      uploadList.push({
-        key: "icFront",
-        name: "IC Front",
-        folder: "ic-front",
-        file: files.icFront.file
-      })
+    if (import.meta.env.VITE_DEBUG === "true") {
+      const { data } = await supabase.auth.getSession()
+      debugLog("User logged in:", data.session?.user?.email)
     }
 
-    if (files.icBack) {
-      uploadList.push({
-        key: "icBack",
-        name: "IC Back",
-        folder: "ic-back",
-        file: files.icBack.file
-      })
+    setLoading(true)
+
+    const uploadResult = {
+      bankSlips: []
     }
+    const qrValue = `NIR-${Date.now()}`
 
-    if (files.bankSlip) {
-      uploadList.push({
-        key: "bankSlip",
-        name: "Bank Slip",
-        folder: "bank-slip",
-        file: files.bankSlip.file
-      })
-    }
-
-    for (let i = 0; i < uploadList.length; i++) {
-
-      const item = uploadList[i]
-
-      setUploadStatus(
-        `Uploading ${item.name} (${i + 1}/${uploadList.length})`
-      )
-
-      try {
-
-        const path = await uploadFile(
-          item.file,
-          item.folder
-        )
-
-        if (!path) {
-          throw new Error(`Failed to upload ${item.name}`)
-        }
-
-        uploadResult[item.key] = path
-
-        await logUploadEvent({
-          qrcode: qrValue,
-          event: "UPLOAD_SUCCESS",
-          fileType: item.name,
-          filePath: path
-        })
-
-      } catch (error) {
-
-        await logUploadEvent({
-          qrcode: qrValue,
-          event: "UPLOAD_FAILED",
-          fileType: item.name,
-          errorMessage: error.message
-        })
-
-        throw error
-      }
-    }
-
-    const { error } = await supabase
-      .from('submissions')
-      .insert({
-        ic_front_path: uploadResult.icFront || null,
-        ic_back_path: uploadResult.icBack || null,
-        bank_slip_path: uploadResult.bankSlip || null,
-        qrcode: qrValue,
-        status: "Pending"
-      })
-
-    if (error) {
-
-      debugError("Database insert error:", error)
+    try {
 
       await logUploadEvent({
         qrcode: qrValue,
-        event: "DATABASE_INSERT_FAILED",
+        event: "SUBMIT_STARTED"
+      })
+
+      const uploadList = []
+
+      if (files.icFront) {
+        uploadList.push({
+          key: "icFront",
+          name: "IC Front",
+          folder: "ic-front",
+          file: files.icFront.file
+        })
+      }
+
+      if (files.icBack) {
+        uploadList.push({
+          key: "icBack",
+          name: "IC Back",
+          folder: "ic-back",
+          file: files.icBack.file
+        })
+      }
+
+      files.bankSlip.forEach((bankSlip, index) => {
+        uploadList.push({
+          key: `bankSlip_${index}`,
+          name: `Bank Slip ${index + 1}`,
+          folder: "bank-slip",
+          file: bankSlip.file
+        })
+      })
+
+      for (let i = 0; i < uploadList.length; i++) {
+
+        const item = uploadList[i]
+
+        setUploadStatus(
+          `Uploading ${item.name} (${i + 1}/${uploadList.length})`
+        )
+
+        try {
+
+          const path = await uploadFile(
+            item.file,
+            item.folder
+          )
+
+          if (!path) {
+            throw new Error(`Failed to upload ${item.name}`)
+          }
+
+          if (item.key.startsWith("bankSlip_")) {
+            uploadResult.bankSlips.push(path)
+          } else {
+            uploadResult[item.key] = path
+          }
+
+          await logUploadEvent({
+            qrcode: qrValue,
+            event: "UPLOAD_SUCCESS",
+            fileType: item.name,
+            filePath: path
+          })
+
+        } catch (error) {
+
+          await logUploadEvent({
+            qrcode: qrValue,
+            event: "UPLOAD_FAILED",
+            fileType: item.name,
+            errorMessage: error.message
+          })
+
+          throw error
+        }
+      }
+
+      const { error } = await supabase
+        .from('submissions')
+        .insert({
+          ic_front_path: uploadResult.icFront || null,
+          ic_back_path: uploadResult.icBack || null,
+          bank_slip_paths: uploadResult.bankSlips,
+          qrcode: qrValue,
+          status: "Pending"
+        })
+
+      if (error) {
+
+        debugError("Database insert error:", error)
+
+        await logUploadEvent({
+          qrcode: qrValue,
+          event: "DATABASE_INSERT_FAILED",
+          errorMessage: error.message
+        })
+
+        // Database insert failed,
+        // so remove the files that were already uploaded.
+        await deleteUploadedFiles(uploadResult)
+
+        setUploadStatus(
+          `Database Error: ${error.message}`
+        )
+
+        return
+      }
+
+      await logUploadEvent({
+        qrcode: qrValue,
+        event: "DATABASE_INSERT_SUCCESS"
+      })
+
+      setUploadStatus("")
+      setQrCode(qrValue)
+
+    } catch (error) {
+
+      debugError("Submit error:", error)
+
+      await logUploadEvent({
+        qrcode: qrValue,
+        event: "SUBMIT_FAILED",
         errorMessage: error.message
       })
 
-      // Database insert failed,
-      // so remove the files that were already uploaded.
+      // Clean up any files that were successfully uploaded
+      // before the error occurred.
       await deleteUploadedFiles(uploadResult)
 
       setUploadStatus(
-        `Database Error: ${error.message}`
+        `Error: ${error.message}`
       )
 
-      return
+    } finally {
+
+      setLoading(false)
+
     }
-
-    await logUploadEvent({
-      qrcode: qrValue,
-      event: "DATABASE_INSERT_SUCCESS"
-    })
-
-    setUploadStatus("")
-    setQrCode(qrValue)
-
-  } catch (error) {
-
-    debugError("Submit error:", error)
-
-    await logUploadEvent({
-      qrcode: qrValue,
-      event: "SUBMIT_FAILED",
-      errorMessage: error.message
-    })
-
-    // Clean up any files that were successfully uploaded
-    // before the error occurred.
-    await deleteUploadedFiles(uploadResult)
-
-    setUploadStatus(
-      `Error: ${error.message}`
-    )
-
-  } finally {
-
-    setLoading(false)
-
   }
-}
 
   if (qrCode) {
-      return (
-        <div className="app">
-          <div className="form-container qr-success">
+    return (
+      <div className="app">
+        <div className="form-container qr-success">
 
-            <img src={logo} alt="Logo" />
+          <img src={logo} alt="Logo" />
 
-            <h2>Upload Successful</h2>
+          <h2>Upload Successful</h2>
 
-            <p>
-              Please scan this QR code at the kiosk.
-            </p>
+          <p>
+            Please scan this QR code at the kiosk.
+          </p>
 
-            <QRCodeCanvas
-              value={qrCode}
-              size={250}
-            />
+          <QRCodeCanvas
+            value={qrCode}
+            size={250}
+          />
 
-            <p>{qrCode}</p>
+          <p>{qrCode}</p>
 
-            <button
-              onClick={() => {
-                setQrCode(null)
-                Object.values(files).forEach(item => {
-                  if (item?.preview) {
-                    URL.revokeObjectURL(item.preview)
-                  }
-                })
+          <button
+            onClick={() => {
+              setQrCode(null)
+              if (files.icFront?.preview) {
+                URL.revokeObjectURL(files.icFront.preview)
+              }
 
-                setFiles({
-                  icFront: null,
-                  icBack: null,
-                  bankSlip: null
-                })
-                setAgree(false)
-                setUploadStatus("")
-              }}
-            >
-              Upload Another Document
-            </button>
+              if (files.icBack?.preview) {
+                URL.revokeObjectURL(files.icBack.preview)
+              }
 
+              files.bankSlip.forEach(item => {
+                if (item?.preview) {
+                  URL.revokeObjectURL(item.preview)
+                }
+              })
+
+              setFiles({
+                icFront: null,
+                icBack: null,
+                bankSlip: []
+              })
+              setAgree(false)
+              setUploadStatus("")
+            }}
+          >
+            Upload Another Document
+          </button>
+
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-box">
+            {uploadStatus}
           </div>
         </div>
-      )
-    }
+      )}
 
-    return (
-      <>
-        {loading && (
-          <div className="loading-overlay">
-            <div className="loading-box">
-              {uploadStatus}
+      <div className="app">
+
+
+        <div className="form-container">
+          <img src={logo} alt="Logo" />
+
+          <p>Fill in the above information.</p>
+
+          <form onSubmit={handleSubmit}>
+            <div>
+              <label>IC Front Image:</label>
+
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                onChange={(e) => handleFileChange(e, "icFront")}
+              />
+              <p className="file-note">
+                Supported formats: JPG, JPEG, PNG
+              </p>
             </div>
-          </div>
-        )}
 
-        <div className="app">
+            <div>
+              <label>IC Back Image:</label>
 
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                onChange={(e) => handleFileChange(e, "icBack")}
+              />
+              <p className="file-note">
+                Supported formats: JPG, JPEG, PNG
+              </p>
+            </div>
 
-          <div className="form-container">
-            <img src={logo} alt="Logo" />
+            <div>
+              <label>Bank Slip:</label>
 
-            <p>Fill in the above information.</p>
+              <input
+                type="file"
+                accept="image/*,application/pdf"
+                multiple
+                onChange={(e) => handleFileChange(e, "bankSlip")}
+              />
 
-            <form onSubmit={handleSubmit}>
-              <div>
-                <label>IC Front Image:</label>
+              <p className="file-note">
+                Supported formats: JPG, JPEG, PNG, PDF
+              </p>
+            </div>
+            <div className="preview-box">
 
-                <input
-                  type="file"
-                  accept=".jpg,.jpeg,.png"
-                  onChange={(e) => handleFileChange(e, "icFront")}
-                />
-                <p className="file-note">
-                  Supported formats: JPG, JPEG, PNG
-                </p>
-              </div>
+              <h3>
+                {files.icFront ||
+                  files.icBack ||
+                  files.bankSlip.length > 0
+                  ? "Uploaded Documents"
+                  : "No document uploaded yet"}
+              </h3>
 
-              <div>
-                <label>IC Back Image:</label>
+              <div className="ic-preview-row">
 
-                <input
-                  type="file"
-                  accept=".jpg,.jpeg,.png"
-                  onChange={(e) => handleFileChange(e, "icBack")}
-                />
-                <p className="file-note">
-                  Supported formats: JPG, JPEG, PNG
-                </p>
-              </div>
-
-              <div>
-                <label>Bank Slip:</label>
-
-                <input
-                  type="file"
-                  accept="image/*,application/pdf"
-                  onChange={(e) => handleFileChange(e, "bankSlip")}
-                />
-
-                <p className="file-note">
-                  Supported formats: JPG, JPEG, PNG, PDF
-                </p>
-              </div>
-              <div className="preview-box">
-
-                <h3>
-                  {files.icFront || files.icBack || files.bankSlip
-                    ? "Uploaded Documents"
-                    : "No document uploaded yet"}
-                </h3>
-
-                <div className="ic-preview-row">
-
-                  {files.icFront && (
-                    <div className="file-card">
-
-                      <button
-                        className="remove-btn"
-                        onClick={() => removeFile("icFront")}
-                        type="button"
-                      >
-                        X
-                      </button>
-
-                      <FilePreview
-                        file={files.icFront.file}
-                        preview={files.icFront.preview}
-                        alt="IC Front"
-                      />
-
-                      <div>
-                        <p>IC Front</p>
-                        <small title={files.icFront.file.name}>
-                          {files.icFront.file.name.length > 25
-                            ? files.icFront.file.name.substring(0, 22) + "..."
-                            : files.icFront.file.name}
-                        </small>
-                      </div>
-
-                    </div>
-                  )}
-
-                  {files.icBack && (
-                    <div className="file-card">
-
-                      <button
-                        className="remove-btn"
-                        onClick={() => removeFile("icBack")}
-                        type="button"
-                      >
-                        X
-                      </button>
-                      <FilePreview
-                        file={files.icBack.file}
-                        preview={files.icBack.preview}
-                        alt="IC Back"
-                      />
-
-                      <div>
-                        <p>IC Back</p>
-                        <small title={files.icBack.file.name}>
-                          {files.icBack.file.name.length > 25
-                            ? files.icBack.file.name.substring(0, 22) + "..."
-                            : files.icBack.file.name}
-                        </small>
-
-
-                      </div>
-                    </div>
-                  )}
-
-                </div>
-
-                {files.bankSlip && (
+                {files.icFront && (
                   <div className="file-card">
 
                     <button
                       className="remove-btn"
-                      onClick={() => removeFile("bankSlip")}
+                      onClick={() => removeFile("icFront")}
                       type="button"
                     >
                       X
                     </button>
 
                     <FilePreview
-                      file={files.bankSlip.file}
-                      preview={files.bankSlip.preview}
-                      alt="Bank Slip"
+                      file={files.icFront.file}
+                      preview={files.icFront.preview}
+                      alt="IC Front"
                     />
 
-
                     <div>
-                      <p>Bank Slip</p>
-                      <small title={files.bankSlip.file.name}>
-                        {files.bankSlip.file.name.length > 25
-                          ? files.bankSlip.file.name.substring(0, 22) + "..."
-                          : files.bankSlip.file.name}
+                      <p>IC Front</p>
+                      <small title={files.icFront.file.name}>
+                        {files.icFront.file.name.length > 25
+                          ? files.icFront.file.name.substring(0, 22) + "..."
+                          : files.icFront.file.name}
                       </small>
                     </div>
 
                   </div>
                 )}
 
+                {files.icBack && (
+                  <div className="file-card">
+
+                    <button
+                      className="remove-btn"
+                      onClick={() => removeFile("icBack")}
+                      type="button"
+                    >
+                      X
+                    </button>
+                    <FilePreview
+                      file={files.icBack.file}
+                      preview={files.icBack.preview}
+                      alt="IC Back"
+                    />
+
+                    <div>
+                      <p>IC Back</p>
+                      <small title={files.icBack.file.name}>
+                        {files.icBack.file.name.length > 25
+                          ? files.icBack.file.name.substring(0, 22) + "..."
+                          : files.icBack.file.name}
+                      </small>
+
+
+                    </div>
+                  </div>
+                )}
+
               </div>
 
-              <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={agree}
-                    onChange={(e) => setAgree(e.target.checked)}
+              {files.bankSlip.map((bankSlip, index) => (
+                <div className="file-card" key={bankSlip.preview}>
+
+                  <button
+                    className="remove-btn"
+                    onClick={() => removeFile("bankSlip", index)}
+                    type="button"
+                  >
+                    X
+                  </button>
+
+                  <FilePreview
+                    file={bankSlip.file}
+                    preview={bankSlip.preview}
+                    alt={`Bank Slip ${index + 1}`}
                   />
 
-                  By Clicking on Submit, You agree to Nirvana's{" "}
-                  <a href="/terms-and-conditions.pdf" target="_blank">
-                    Terms and Conditions of Use
-                  </a>
-                </label>
+                  <div>
+                    <p>Bank Slip {index + 1}</p>
 
-                <br />
+                    <small title={bankSlip.file.name}>
+                      {bankSlip.file.name.length > 25
+                        ? bankSlip.file.name.substring(0, 22) + "..."
+                        : bankSlip.file.name}
+                    </small>
+                  </div>
 
-                <span>
-                  To learn more about how Nirvana collects, uses, shares, and protects your personal data,
-                  please see Nirvana's{" "}
-                  <a href="/privacy-policy.pdf" target="_blank">
-                    Privacy Policy
-                  </a>
-                </span>
-              </div>
+                </div>
+              ))}
 
-              <button
-                type="submit"
-                disabled={!canSubmit()}
-              >
-                {loading ? "Uploading..." : "Submit"}
-              </button>
-            </form>
-          </div>
+            </div>
+
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={agree}
+                  onChange={(e) => setAgree(e.target.checked)}
+                />
+
+                By Clicking on Submit, You agree to Nirvana's{" "}
+                <a href="/terms-and-conditions.pdf" target="_blank">
+                  Terms and Conditions of Use
+                </a>
+              </label>
+
+              <br />
+
+              <span>
+                To learn more about how Nirvana collects, uses, shares, and protects your personal data,
+                please see Nirvana's{" "}
+                <a href="/privacy-policy.pdf" target="_blank">
+                  Privacy Policy
+                </a>
+              </span>
+            </div>
+
+            <button
+              type="submit"
+              disabled={!canSubmit()}
+            >
+              {loading ? "Uploading..." : "Submit"}
+            </button>
+          </form>
         </div>
-      </>
-    )
-  }
+      </div>
+    </>
+  )
+}
 
-  export default App
+export default App
