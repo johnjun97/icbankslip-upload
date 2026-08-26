@@ -27,35 +27,35 @@ function Monitor() {
 
     useEffect(() => {
 
-    const interval = setInterval(() => {
+        const interval = setInterval(() => {
 
-        console.log(
-            `[Monitor] Refreshing all data at ${new Date().toLocaleTimeString()}`
-        )
+            console.log(
+                `[Monitor] Refreshing all data at ${new Date().toLocaleTimeString()}`
+            )
 
-        setRefreshTrigger(prev => prev + 1)
+            setRefreshTrigger(prev => prev + 1)
 
-    }, 60000)
+        }, 60000)
 
-    return () => {
-        clearInterval(interval)
-    }
+        return () => {
+            clearInterval(interval)
+        }
 
-}, [])
+    }, [])
 
-const {
-    total,
-    totalUploadFiles,
-    loadingUploadFiles,
-    printed,
-    loadingTotal,
-    loadingPrinted
-} = useMonitorStats(
-    user,
-    chartRange,
-    printSource,
-    refreshTrigger
-)
+    const {
+        total,
+        totalUploadFiles,
+        loadingUploadFiles,
+        printed,
+        loadingTotal,
+        loadingPrinted
+    } = useMonitorStats(
+        user,
+        chartRange,
+        printSource,
+        refreshTrigger
+    )
 
     const {
         pending,
@@ -65,18 +65,18 @@ const {
         loadingData,
         lastUpdated
     } = useMonitorData(
-    user,
-    refreshTrigger
-)
+        user,
+        refreshTrigger
+    )
 
     const {
         chartData
     } = useMonitorChart(
-    user,
-    chartRange,
-    printSource,
-    refreshTrigger
-)
+        user,
+        chartRange,
+        printSource,
+        refreshTrigger
+    )
 
     const loadPrintSources = async () => {
 
@@ -132,12 +132,12 @@ const {
     return (
         <div className="monitor-page">
 
-   <MonitorHeader
-    email={user.email}
-    lastUpdated={lastUpdated}
-    onLogout={logout}
-    version={packageInfo.version}
-/>
+            <MonitorHeader
+                email={user.email}
+                lastUpdated={lastUpdated}
+                onLogout={logout}
+                version={packageInfo.version}
+            />
 
             <SummaryCards
                 loading={loadingData}

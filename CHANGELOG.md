@@ -4,3 +4,8 @@
 
 ### Added
 - version in MonitorHeader
+
+# [1.1.2] - 20260826
+
+### Added 
+- upload_log
