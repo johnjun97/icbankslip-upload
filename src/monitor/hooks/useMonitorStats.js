@@ -558,13 +558,13 @@ export default function useMonitorStats(
                 totalFiles++
             }
 
-if (item.bank_slip_path) {
-    totalFiles++
-}
+            if (item.bank_slip_path) {
+                totalFiles++
+            }
 
-if (Array.isArray(item.bank_slip_paths)) {
-    totalFiles += item.bank_slip_paths.length
-}
+            if (Array.isArray(item.bank_slip_paths)) {
+                totalFiles += item.bank_slip_paths.length
+            }
 
         })
 

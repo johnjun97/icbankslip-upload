@@ -222,6 +222,24 @@ button:disabled {
   z-index: 10;
 }
 
+.logo-version {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+}
+
+.logo-version img {
+  display: block;
+}
+
+.logo-version span {
+  font-size: 11px;
+  color: #888;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 @media (max-width: 600px) {
 
   .app {
