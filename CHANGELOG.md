@@ -1,8 +1,6 @@
 # Change Log
 
-update version in 
-- package.json
-- src\version.js
+update version in package.json
 
 # [1.1.1] - 20260820
 
@@ -23,3 +21,7 @@ update version in
 - tried to fix no upload_logs
 - tried to fix fix upload to bank_slip_path 
 - add version on submit page
+
+# [1.1.5] - 20260828
+
+- change to use packageInfo.version

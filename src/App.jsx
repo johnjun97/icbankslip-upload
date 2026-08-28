@@ -8,7 +8,7 @@ import 'react-pdf/dist/Page/TextLayer.css'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
 import { v4 as uuidv4 } from 'uuid'
 import { debugLog, debugError } from './lib/debug'
-import { APP_VERSION } from './version'
+import packageInfo from '../package.json'
 
 pdfjs.GlobalWorkerOptions.workerSrc =
   `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
@@ -431,7 +431,7 @@ function App() {
 
           <div className="logo-version">
             <img src={logo} alt="Logo" />
-            <span>v{APP_VERSION}</span>
+            <span>v{packageInfo.version}</span>
           </div>
 
           <h2>Upload Successful</h2>
@@ -497,7 +497,7 @@ function App() {
         <div className="form-container">
           <div className="logo-version">
             <img src={logo} alt="Logo" />
-            <span>v{APP_VERSION}</span>
+            <span>v{packageInfo.version}</span>
           </div>
 
           <p>Fill in the above information.</p>
