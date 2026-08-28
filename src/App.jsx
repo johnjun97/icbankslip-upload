@@ -169,6 +169,15 @@ function App() {
     filePath = null,
     errorMessage = null
   }) => {
+
+    debugLog("LOG EVENT START:", {
+      qrcode,
+      event,
+      fileType,
+      filePath,
+      errorMessage
+    })
+
     try {
       const { error } = await supabase
         .from("upload_logs")
@@ -181,10 +190,16 @@ function App() {
         })
 
       if (error) {
-        debugError("Failed to write upload log:", error)
+        debugError("FAILED TO WRITE UPLOAD LOG:", error)
+        return
       }
+
+      debugLog("UPLOAD LOG CREATED")
+
     } catch (error) {
-      debugError("Upload logging error:", error)
+
+      debugError("UPLOAD LOG EXCEPTION:", error)
+
     }
   }
 
@@ -250,6 +265,9 @@ function App() {
 
     if (import.meta.env.VITE_DEBUG === "true") {
       const { data } = await supabase.auth.getSession()
+
+      debugLog("Session user:", data.session?.user)
+      debugLog("Session role:", data.session?.user?.role)
       debugLog("User logged in:", data.session?.user?.email)
     }
 

@@ -12,4 +12,4 @@
 
 # [1.1.3] - 20260826
 
-- allow multiple bankslip upload, introduce, bank_slip_paths
+- allow multiple bankslip upload, introduce bank_slip_paths
