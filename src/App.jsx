@@ -52,7 +52,7 @@ function App() {
 
   const t = {
     en: {
-      instruction: "Fill in the above information.",
+      instruction: "Please upload your IC and Bank Slip.",
       icFront: "IC Front Image:",
       icBack: "IC Back Image:",
       fileIcFront: "IC Front",
@@ -77,11 +77,14 @@ function App() {
       uploadBankSlip: "Bank Slip",
       uploadSuccessful: "Upload Successful",
       scanQr: "Please scan this QR code at the kiosk.",
-      uploadAnother: "Upload Another Document"
+      uploadAnother: "Upload Another Document",
+      chooseFile: "Choose File",
+      noFileChosen: "No file chosen",
+      preparingUpload: "Preparing upload...",
     },
 
     zh: {
-      instruction: "请填写以上资料。",
+      instruction: "请上传您的身份证和银行单据。",
       icFront: "身份证正面：",
       icBack: "身份证背面：",
       fileIcFront: "身份证正面",
@@ -106,7 +109,10 @@ function App() {
       uploadBankSlip: "银行单据",
       uploadSuccessful: "上传成功",
       scanQr: "请在自助服务机扫描此二维码。",
-      uploadAnother: "上传其他文件"
+      uploadAnother: "上传其他文件",
+      chooseFile: "选择文件",
+      noFileChosen: "尚未选择文件",
+      preparingUpload: "准备上传...",
     }
   }
 
@@ -334,6 +340,7 @@ function App() {
     }
 
     setLoading(true)
+    setUploadStatus(t[language].preparingUpload)
 
     const uploadResult = {
       bankSlips: []
@@ -591,11 +598,26 @@ function App() {
             <div>
               <label>{t[language].icFront}</label>
 
-              <input
-                type="file"
-                accept=".jpg,.jpeg,.png"
-                onChange={(e) => handleFileChange(e, "icFront")}
-              />
+              <div className="custom-file-input">
+
+                <label className="choose-file-button">
+                  {t[language].chooseFile}
+
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png"
+                    onChange={(e) => handleFileChange(e, "icFront")}
+                  />
+                </label>
+
+                <span>
+                  {files.icFront
+                    ? files.icFront.file.name
+                    : t[language].noFileChosen}
+                </span>
+
+              </div>
+
               <p className="file-note">
                 {t[language].supportedImage}
               </p>
@@ -604,11 +626,26 @@ function App() {
             <div>
               <label>{t[language].icBack}</label>
 
-              <input
-                type="file"
-                accept=".jpg,.jpeg,.png"
-                onChange={(e) => handleFileChange(e, "icBack")}
-              />
+              <div className="custom-file-input">
+
+                <label className="choose-file-button">
+                  {t[language].chooseFile}
+
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png"
+                    onChange={(e) => handleFileChange(e, "icBack")}
+                  />
+                </label>
+
+                <span>
+                  {files.icBack
+                    ? files.icBack.file.name
+                    : t[language].noFileChosen}
+                </span>
+
+              </div>
+
               <p className="file-note">
                 {t[language].supportedImage}
               </p>
@@ -617,12 +654,28 @@ function App() {
             <div>
               <label>{t[language].bankSlip}</label>
 
-              <input
-                type="file"
-                accept="image/*,application/pdf"
-                multiple
-                onChange={(e) => handleFileChange(e, "bankSlip")}
-              />
+              <div className="custom-file-input">
+
+                <label className="choose-file-button">
+                  {t[language].chooseFile}
+
+                  <input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    multiple
+                    onChange={(e) => handleFileChange(e, "bankSlip")}
+                  />
+                </label>
+
+                <span>
+                  {files.bankSlip.length === 0
+                    ? t[language].noFileChosen
+                    : files.bankSlip.length === 1
+                      ? files.bankSlip[0].file.name
+                      : `${files.bankSlip.length} ${t[language].filesSelected}`}
+                </span>
+
+              </div>
 
               <p className="file-note">
                 {t[language].supportedBankSlip}

@@ -240,6 +240,64 @@ button:disabled {
   white-space: nowrap;
 }
 
+.choose-file-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-width: 110px;
+  height: 38px;
+  padding: 0 18px;
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  color: #333;
+
+  border: 1px solid #bdbdbd;
+  border-radius: 6px;
+
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.choose-file-button:hover {
+  background-color: #f7f7f7;
+  border-color: #999;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.choose-file-button:active {
+  background-color: #eeeeee;
+}
+
+.choose-file-button input[type="file"] {
+  display: none;
+}
+
+.custom-file-input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.custom-file-input span {
+  font-size: 13px;
+  color: #777;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 600px) {
 
   .app {
