@@ -8,6 +8,7 @@ function MonitorLogin() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
 
@@ -31,12 +32,15 @@ function MonitorLogin() {
 
     const login = async () => {
 
+        setIsLoading(true)
+
         const { error } = await supabase.auth.signInWithPassword({
             email,
             password
         })
 
         if (error) {
+            setIsLoading(false)
             alert(error.message)
             return
         }
@@ -61,36 +65,36 @@ function MonitorLogin() {
                     onChange={(e) => setEmail(e.target.value)}
                 />
 
-<div className="password-wrapper">
+                <div className="password-wrapper">
 
-    <input
-        type={showPassword ? "text" : "password"}
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        onKeyDown={(e) => {
-            if (e.key === "Enter") {
-                login()
-            }
-        }}
-    />
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" && !isLoading) {
+                                login()
+                            }
+                        }}
+                    />
 
 
-    <span
-        className="eye-icon"
-        onClick={() => setShowPassword(!showPassword)}
-    >
-        {
-            showPassword
-                ? <FaEyeSlash />
-                : <FaEye />
-        }
-    </span>
+                    <span
+                        className="eye-icon"
+                        onClick={() => setShowPassword(!showPassword)}
+                    >
+                        {
+                            showPassword
+                                ? <FaEyeSlash />
+                                : <FaEye />
+                        }
+                    </span>
 
-</div>
+                </div>
 
-                <button onClick={login}>
-                    Login
+                <button onClick={login} disabled={isLoading}>
+                    {isLoading ? "Logging in..." : "Login"}
                 </button>
 
             </div>
