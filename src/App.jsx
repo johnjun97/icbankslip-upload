@@ -48,6 +48,67 @@ function App() {
   const [agree, setAgree] = useState(false)
   const [loading, setLoading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState("")
+  const [language, setLanguage] = useState("en")
+
+  const t = {
+    en: {
+      instruction: "Fill in the above information.",
+      icFront: "IC Front Image:",
+      icBack: "IC Back Image:",
+      fileIcFront: "IC Front",
+      fileIcBack: "IC Back",
+      fileBankSlip: "Bank Slip",
+      bankSlip: "Bank Slip:",
+      uploadedDocuments: "Uploaded Documents",
+      noDocument: "No document uploaded yet",
+      supportedImage: "Supported formats: JPG, JPEG, PNG",
+      supportedBankSlip: "Supported formats: JPG, JPEG, PNG, PDF",
+      terms:
+        "By Clicking on Submit, You agree to Nirvana's",
+      termsLink: "Terms and Conditions of Use",
+      privacy:
+        "To learn more about how Nirvana collects, uses, shares, and protects your personal data, please see Nirvana's",
+      privacyLink: "Privacy Policy",
+      submit: "Submit",
+      uploading: "Uploading...",
+      uploadProgress: "Uploading",
+      uploadIcFront: "IC Front",
+      uploadIcBack: "IC Back",
+      uploadBankSlip: "Bank Slip",
+      uploadSuccessful: "Upload Successful",
+      scanQr: "Please scan this QR code at the kiosk.",
+      uploadAnother: "Upload Another Document"
+    },
+
+    zh: {
+      instruction: "请填写以上资料。",
+      icFront: "身份证正面：",
+      icBack: "身份证背面：",
+      fileIcFront: "身份证正面",
+      fileIcBack: "身份证背面",
+      fileBankSlip: "银行单据",
+      bankSlip: "银行单据：",
+      uploadedDocuments: "已上传文件",
+      noDocument: "尚未上传任何文件",
+      supportedImage: "支持格式：JPG、JPEG、PNG",
+      supportedBankSlip: "支持格式：JPG、JPEG、PNG、PDF",
+      terms:
+        "点击提交即表示您同意 Nirvana 的",
+      termsLink: "使用条款",
+      privacy:
+        "如需了解 Nirvana 如何收集、使用、分享及保护您的个人资料，请参阅 Nirvana 的",
+      privacyLink: "隐私政策",
+      submit: "提交",
+      uploading: "上传中...",
+      uploadProgress: "正在上传",
+      uploadIcFront: "身份证正面",
+      uploadIcBack: "身份证背面",
+      uploadBankSlip: "银行单据",
+      uploadSuccessful: "上传成功",
+      scanQr: "请在自助服务机扫描此二维码。",
+      uploadAnother: "上传其他文件"
+    }
+  }
 
   const [files, setFiles] = useState({
     icFront: null,
@@ -291,7 +352,7 @@ function App() {
       if (files.icFront) {
         uploadList.push({
           key: "icFront",
-          name: "IC Front",
+          name: t[language].uploadIcFront,
           folder: "ic-front",
           file: files.icFront.file
         })
@@ -300,7 +361,7 @@ function App() {
       if (files.icBack) {
         uploadList.push({
           key: "icBack",
-          name: "IC Back",
+          name: t[language].uploadIcBack,
           folder: "ic-back",
           file: files.icBack.file
         })
@@ -309,7 +370,7 @@ function App() {
       files.bankSlip.forEach((bankSlip, index) => {
         uploadList.push({
           key: `bankSlip_${index}`,
-          name: `Bank Slip ${index + 1}`,
+          name: `${t[language].uploadBankSlip} ${index + 1}`,
           folder: "bank-slip",
           file: bankSlip.file
         })
@@ -320,7 +381,7 @@ function App() {
         const item = uploadList[i]
 
         setUploadStatus(
-          `Uploading ${item.name} (${i + 1}/${uploadList.length})`
+          `${t[language].uploadProgress} ${item.name} (${i + 1}/${uploadList.length})`
         )
 
         try {
@@ -430,14 +491,27 @@ function App() {
         <div className="form-container qr-success">
 
           <div className="logo-version">
+
             <img src={logo} alt="Logo" />
+
             <span>v{packageInfo.version}</span>
+
+            <button
+              type="button"
+              className="language-button"
+              onClick={() => {
+                setLanguage(language === "en" ? "zh" : "en")
+              }}
+            >
+              {language === "en" ? "中文" : "EN"}
+            </button>
+
           </div>
 
-          <h2>Upload Successful</h2>
+          <h2>{t[language].uploadSuccessful}</h2>
 
           <p>
-            Please scan this QR code at the kiosk.
+            {t[language].scanQr}
           </p>
 
           <QRCodeCanvas
@@ -473,7 +547,7 @@ function App() {
               setUploadStatus("")
             }}
           >
-            Upload Another Document
+            {t[language].uploadAnother}
           </button>
 
         </div>
@@ -497,14 +571,25 @@ function App() {
         <div className="form-container">
           <div className="logo-version">
             <img src={logo} alt="Logo" />
+
             <span>v{packageInfo.version}</span>
+
+            <button
+              type="button"
+              className="language-button"
+              onClick={() => {
+                setLanguage(language === "en" ? "zh" : "en")
+              }}
+            >
+              {language === "en" ? "中文" : "EN"}
+            </button>
           </div>
 
-          <p>Fill in the above information.</p>
+          <p>{t[language].instruction}</p>
 
           <form onSubmit={handleSubmit}>
             <div>
-              <label>IC Front Image:</label>
+              <label>{t[language].icFront}</label>
 
               <input
                 type="file"
@@ -512,12 +597,12 @@ function App() {
                 onChange={(e) => handleFileChange(e, "icFront")}
               />
               <p className="file-note">
-                Supported formats: JPG, JPEG, PNG
+                {t[language].supportedImage}
               </p>
             </div>
 
             <div>
-              <label>IC Back Image:</label>
+              <label>{t[language].icBack}</label>
 
               <input
                 type="file"
@@ -525,12 +610,12 @@ function App() {
                 onChange={(e) => handleFileChange(e, "icBack")}
               />
               <p className="file-note">
-                Supported formats: JPG, JPEG, PNG
+                {t[language].supportedImage}
               </p>
             </div>
 
             <div>
-              <label>Bank Slip:</label>
+              <label>{t[language].bankSlip}</label>
 
               <input
                 type="file"
@@ -540,7 +625,7 @@ function App() {
               />
 
               <p className="file-note">
-                Supported formats: JPG, JPEG, PNG, PDF
+                {t[language].supportedBankSlip}
               </p>
             </div>
             <div className="preview-box">
@@ -549,8 +634,8 @@ function App() {
                 {files.icFront ||
                   files.icBack ||
                   files.bankSlip.length > 0
-                  ? "Uploaded Documents"
-                  : "No document uploaded yet"}
+                  ? t[language].uploadedDocuments
+                  : t[language].noDocument}
               </h3>
 
               <div className="ic-preview-row">
@@ -573,7 +658,7 @@ function App() {
                     />
 
                     <div>
-                      <p>IC Front</p>
+                      <p>{t[language].fileIcFront}</p>
                       <small title={files.icFront.file.name}>
                         {files.icFront.file.name.length > 25
                           ? files.icFront.file.name.substring(0, 22) + "..."
@@ -601,7 +686,7 @@ function App() {
                     />
 
                     <div>
-                      <p>IC Back</p>
+                      <p>{t[language].fileIcBack}</p>
                       <small title={files.icBack.file.name}>
                         {files.icBack.file.name.length > 25
                           ? files.icBack.file.name.substring(0, 22) + "..."
@@ -633,7 +718,7 @@ function App() {
                   />
 
                   <div>
-                    <p>Bank Slip {index + 1}</p>
+                    <p>{t[language].fileBankSlip} {index + 1}</p>
 
                     <small title={bankSlip.file.name}>
                       {bankSlip.file.name.length > 25
@@ -655,19 +740,18 @@ function App() {
                   onChange={(e) => setAgree(e.target.checked)}
                 />
 
-                By Clicking on Submit, You agree to Nirvana's{" "}
+                {t[language].terms}{" "}
                 <a href="/terms-and-conditions.pdf" target="_blank">
-                  Terms and Conditions of Use
+                  {t[language].termsLink}
                 </a>
               </label>
 
               <br />
 
               <span>
-                To learn more about how Nirvana collects, uses, shares, and protects your personal data,
-                please see Nirvana's{" "}
+                {t[language].privacy}{" "}
                 <a href="/privacy-policy.pdf" target="_blank">
-                  Privacy Policy
+                  {t[language].privacyLink}
                 </a>
               </span>
             </div>
@@ -676,7 +760,9 @@ function App() {
               type="submit"
               disabled={!canSubmit()}
             >
-              {loading ? "Uploading..." : "Submit"}
+              {loading
+                ? t[language].uploading
+                : t[language].submit}
             </button>
           </form>
         </div>

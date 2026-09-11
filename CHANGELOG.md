@@ -25,3 +25,11 @@ update version in package.json
 # [1.1.5] - 20260828
 
 - change to use packageInfo.version
+
+# [1.1.5] - 20260911 
+
+- add loading on login
+
+# [1.1.6] - 20260911
+
+-add Bilingual
