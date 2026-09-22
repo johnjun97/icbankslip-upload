@@ -33,3 +33,7 @@ update version in package.json
 # [1.1.6] - 20260911
 
 -add Bilingual
+
+# [1.1.7] - 20260921
+
+- add dropdown for print copies

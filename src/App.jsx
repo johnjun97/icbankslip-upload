@@ -80,7 +80,10 @@ function App() {
       uploadAnother: "Upload Another Document",
       chooseFile: "Choose File",
       noFileChosen: "No file chosen",
+      filesSelected: "files selected",
       preparingUpload: "Preparing upload...",
+      copy: "Copy",
+      copies: "Copies",
     },
 
     zh: {
@@ -112,7 +115,10 @@ function App() {
       uploadAnother: "上传其他文件",
       chooseFile: "选择文件",
       noFileChosen: "尚未选择文件",
+      filesSelected: "个文件已选择",
       preparingUpload: "准备上传...",
+      copy: "份",
+      copies: "份",
     }
   }
 
@@ -121,6 +127,9 @@ function App() {
     icBack: null,
     bankSlip: []
   })
+
+  const [printCopies, setPrintCopies] = useState(1)
+  const [bankSlipCopies, setBankSlipCopies] = useState([])
 
   const handleFileChange = (e, fileName) => {
 
@@ -177,6 +186,11 @@ function App() {
           ...newFiles
         ]
       }))
+
+      setBankSlipCopies(prev => [
+        ...prev,
+        ...selectedFiles.map(() => 1)
+      ])
 
     } else {
 
@@ -314,6 +328,10 @@ function App() {
         )
       }))
 
+      setBankSlipCopies(prev =>
+        prev.filter((_, i) => i !== index)
+      )
+
       return
     }
 
@@ -434,6 +452,8 @@ function App() {
           ic_front_path: uploadResult.icFront || null,
           ic_back_path: uploadResult.icBack || null,
           bank_slip_paths: uploadResult.bankSlips,
+          ic_copies: printCopies,
+          bank_slip_copies: bankSlipCopies,
           qrcode: qrValue,
           status: "Pending"
         })
@@ -552,6 +572,9 @@ function App() {
               })
               setAgree(false)
               setUploadStatus("")
+
+              setPrintCopies(1)
+              setBankSlipCopies([])
             }}
           >
             {t[language].uploadAnother}
@@ -621,6 +644,7 @@ function App() {
               <p className="file-note">
                 {t[language].supportedImage}
               </p>
+
             </div>
 
             <div>
@@ -649,6 +673,7 @@ function App() {
               <p className="file-note">
                 {t[language].supportedImage}
               </p>
+
             </div>
 
             <div>
@@ -753,6 +778,23 @@ function App() {
 
               </div>
 
+              {(files.icFront || files.icBack) && (
+                <div className="print-copies-section">
+                  <select
+                    id="print-copies"
+                    className="print-copies-select"
+                    value={printCopies}
+                    onChange={(e) =>
+                      setPrintCopies(Number(e.target.value))
+                    }
+                  >
+                    <option value={1}>1 {t[language].copy}</option>
+                    <option value={2}>2 {t[language].copies}</option>
+                    <option value={3}>3 {t[language].copies}</option>
+                  </select>
+                </div>
+              )}
+
               {files.bankSlip.map((bankSlip, index) => (
                 <div className="file-card" key={bankSlip.preview}>
 
@@ -780,7 +822,26 @@ function App() {
                     </small>
                   </div>
 
+                  <select
+                    className="print-copies-select"
+                    value={bankSlipCopies[index] || 1}
+                    onChange={(e) => {
+                      const value = Number(e.target.value)
+
+                      setBankSlipCopies(prev => {
+                        const updated = [...prev]
+                        updated[index] = value
+                        return updated
+                      })
+                    }}
+                  >
+                    <option value={1}>1 {t[language].copy}</option>
+                    <option value={2}>2 {t[language].copies}</option>
+                    <option value={3}>3 {t[language].copies}</option>
+                  </select>
+
                 </div>
+
               ))}
 
             </div>

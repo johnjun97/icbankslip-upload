@@ -359,12 +359,13 @@ export default function useMonitorStats(
 
         let query = supabase
             .from('submissions')
-            .select(`  
-                ic_front_path,
-                ic_back_path,
-                bank_slip_path,
-                bank_slip_paths
-                `)
+            .select(`
+    ic_front_path,
+    ic_back_path,
+    bank_slip_paths,
+    ic_copies,
+    bank_slip_copies
+`)
             .eq(
                 'status',
                 'Printed'
@@ -546,30 +547,48 @@ export default function useMonitorStats(
         }
 
 
-        let totalFiles = 0
+        let totalCopies = 0
 
         data.forEach(item => {
 
+            const icCopies =
+                Number(item.ic_copies) >= 1
+                    ? Number(item.ic_copies)
+                    : 1
+
+            // IC Front
             if (item.ic_front_path) {
-                totalFiles++
+                totalCopies += icCopies
             }
 
+            // IC Back
             if (item.ic_back_path) {
-                totalFiles++
+                totalCopies += icCopies
             }
 
-            if (item.bank_slip_path) {
-                totalFiles++
-            }
-
+            // Bank Slips
             if (Array.isArray(item.bank_slip_paths)) {
-                totalFiles += item.bank_slip_paths.length
+
+                const bankSlipCopies =
+                    Array.isArray(item.bank_slip_copies)
+                        ? item.bank_slip_copies
+                        : []
+
+                item.bank_slip_paths.forEach((_, index) => {
+
+                    const copies =
+                        Number(bankSlipCopies[index]) >= 1
+                            ? Number(bankSlipCopies[index])
+                            : 1
+
+                    totalCopies += copies
+
+                })
             }
 
         })
 
-
-        setPrinted(totalFiles)
+        setPrinted(totalCopies)
 
         setLoadingPrinted(false)
 

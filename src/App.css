@@ -4,15 +4,6 @@ body {
   background-color: #222;
 }
 
-.form-container {
-  background-color: white;
-  width: 600px;
-  max-width: 100%;
-  padding: 30px;
-  border-radius: 10px;
-  box-sizing: border-box;
-}
-
 #root {
   min-height: 100vh;
 }
@@ -24,6 +15,15 @@ body {
   align-items: center;
   padding: 20px;
   box-sizing: border-box;
+}
+
+.form-container {
+  width: 600px;
+  max-width: 100%;
+  padding: 30px;
+  box-sizing: border-box;
+  background-color: white;
+  border-radius: 10px;
 }
 
 .app img {
@@ -41,12 +41,6 @@ form div {
   display: flex;
   flex-direction: column;
   gap: 5px;
-}
-
-.ic-preview-row {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
 }
 
 label {
@@ -67,6 +61,8 @@ span {
   line-height: 1.5;
 }
 
+/* Buttons */
+
 button {
   height: 40px;
   border: none;
@@ -86,159 +82,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.preview-box {
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 20px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-.file-card {
-  position: relative;
-
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 15px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-
-  max-width: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.file-card img {
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
-  padding: 4px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-.file-card small {
-  display: block;
-  width: 100%;
-  color: #666;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.file-info {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.ic-preview-row .file-card {
-  flex: 1;
-  margin-bottom: 0;
-}
-
-.pdf-thumbnail {
-  width: 70px;
-  height: 70px;
-  overflow: hidden;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: white;
-}
-
-.loading-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.loading-box {
-  background: white;
-  padding: 25px 40px;
-  border-radius: 10px;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.file-note {
-  font-size: 12px;
-  color: #666;
-  margin-top: 5px;
-}
-
-.qr-success {
-  text-align: center;
-}
-
-.qr-success h2 {
-  margin: 20px 0 10px;
-}
-
-.qr-success p {
-  margin: 10px 0;
-}
-
-.qr-success canvas {
-  margin: 25px 0;
-}
-
-.qr-reference {
-  margin-top: 15px;
-  font-size: 20px;
-  font-weight: bold;
-  letter-spacing: 1px;
-}
-
-.remove-btn {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-
-  width: 22px;
-  height: 22px;
-
-  padding: 0;
-  line-height: 22px;
-
-  border-radius: 50%;
-  border: none;
-
-  background: red;
-  color: white;
-
-  font-weight: bold;
-  cursor: pointer;
-
-  z-index: 10;
-}
-
-.logo-version {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 8px;
-}
-
-.logo-version img {
-  display: block;
-}
-
-.logo-version span {
-  font-size: 11px;
-  color: #888;
-  line-height: 1;
-  white-space: nowrap;
-}
+/* Custom file input */
 
 .choose-file-button {
   display: inline-flex;
@@ -249,18 +93,13 @@ button:disabled {
   height: 38px;
   padding: 0 18px;
   box-sizing: border-box;
-
   background-color: #ffffff;
   color: #333;
-
   border: 1px solid #bdbdbd;
   border-radius: 6px;
-
   cursor: pointer;
-
   font-size: 14px;
   font-weight: 500;
-
   transition:
     background-color 0.15s ease,
     border-color 0.15s ease,
@@ -298,8 +137,215 @@ button:disabled {
   white-space: nowrap;
 }
 
-@media (max-width: 600px) {
+/* Preview */
 
+.preview-box {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.ic-preview-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.file-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.ic-preview-row .file-card {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.file-card img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  padding: 4px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.file-card small {
+  display: block;
+  width: 100%;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pdf-thumbnail {
+  width: 70px;
+  height: 70px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+}
+
+/* Print copies */
+
+.print-copies-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+.print-copies-select {
+  min-width: 130px;
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.print-copies-select:hover {
+  border-color: #999;
+  background-color: #f9f9f9;
+}
+
+.print-copies-select:focus {
+  border-color: #666;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+.file-card .print-copies-select {
+  display: block;
+  margin: 10px auto 0;
+}
+
+/* Remove button */
+
+.remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  line-height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: red;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Loading */
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.loading-box {
+  background: white;
+  padding: 25px 40px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* File note */
+
+.file-note {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* QR success */
+
+.qr-success {
+  text-align: center;
+}
+
+.qr-success h2 {
+  margin: 20px 0 10px;
+}
+
+.qr-success p {
+  margin: 10px 0;
+}
+
+.qr-success canvas {
+  margin: 25px 0;
+}
+
+.qr-reference {
+  margin-top: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* Logo */
+
+.logo-version {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+}
+
+.logo-version img {
+  display: block;
+}
+
+.logo-version span {
+  font-size: 11px;
+  color: #888;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
   .app {
     padding: 10px;
     align-items: flex-start;
@@ -324,13 +370,13 @@ button:disabled {
     margin-bottom: 15px;
   }
 
-.file-card {
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  text-align: center;
-}
+  .file-card {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    text-align: center;
+  }
 
   .file-card img,
   .pdf-thumbnail {
@@ -338,15 +384,14 @@ button:disabled {
     height: 100px;
   }
 
-.file-info {
-  width: 100%;
-  text-align: center;
-}
+  .file-info {
+    width: 100%;
+    text-align: center;
+  }
 
   .file-info small {
     font-size: 12px;
     white-space: normal;
     overflow-wrap: anywhere;
   }
-
 }
