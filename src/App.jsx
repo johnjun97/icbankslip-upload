@@ -452,10 +452,10 @@ function App() {
           ic_front_path: uploadResult.icFront || null,
           ic_back_path: uploadResult.icBack || null,
           bank_slip_paths: uploadResult.bankSlips,
-ic_copies:
-  (files.icFront || files.icBack)
-    ? printCopies
-    : 0,
+          ic_copies:
+            (files.icFront || files.icBack)
+              ? printCopies
+              : 0,
           bank_slip_copies: bankSlipCopies,
           qrcode: qrValue,
           status: "Pending"

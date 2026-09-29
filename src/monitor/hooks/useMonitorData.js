@@ -11,6 +11,7 @@ export default function useMonitorData(
     const [expired, setExpired] = useState(null)
     const [storageFiles, setStorageFiles] = useState(null)
     const [loadingData, setLoadingData] = useState(true)
+    const [totalSubmission, setTotalSubmission] = useState(null)
     const [totalLog, setTotalLog] = useState(null)
     const [lastUpdated, setLastUpdated] = useState(null)
 
@@ -56,21 +57,41 @@ export default function useMonitorData(
         )
 
         // Total number of submission logs
-        const { count, error: totalLogError } = await supabase
+        // Total number of submissions
+        // Total number of submissions
+        const { count: submissionCount, error: submissionError } = await supabase
             .from('submissions')
             .select('*', {
                 count: 'exact',
                 head: true
             })
 
-        if (totalLogError) {
+        if (submissionError) {
             debugError(
-                "Load total log count error:",
-                totalLogError
+                "Load total submission count error:",
+                submissionError
             )
         }
 
-        setTotalLog(count || 0)
+        setTotalSubmission(submissionCount || 0)
+
+
+        // Total number of upload logs
+        const { count: logCount, error: logError } = await supabase
+            .from('upload_logs')
+            .select('*', {
+                count: 'exact',
+                head: true
+            })
+
+        if (logError) {
+            debugError(
+                "Load total log count error:",
+                logError
+            )
+        }
+
+        setTotalLog(logCount || 0)
 
 
         const countStorageFiles = async () => {
@@ -134,11 +155,11 @@ export default function useMonitorData(
 
     }, [user, refreshTrigger])
 
-
     return {
         pending,
         expired,
         storageFiles,
+        totalSubmission,
         totalLog,
         loadingData,
         lastUpdated

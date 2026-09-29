@@ -61,6 +61,7 @@ function Monitor() {
         pending,
         expired,
         storageFiles,
+        totalSubmission,
         totalLog,
         loadingData,
         lastUpdated
@@ -144,6 +145,7 @@ function Monitor() {
                 storageFiles={storageFiles}
                 pending={pending}
                 expired={expired}
+                totalSubmission={totalSubmission}
                 totalLog={totalLog}
             />
 
