@@ -542,62 +542,41 @@ function UploadPrintCard({
             const exportRows =
                 combinedData.map(item => {
 
-                    const row = {}
+                    return {
 
+                        id:
+                            item.id,
 
-                    Object.keys(item)
-                        .filter(
-                            column =>
-                                column !== "ic_copies" &&
-                                column !== "bank_slip_copies"
-                        )
-                        .forEach(column => {
+                        created_at:
+                            malaysiaDate(
+                                item.created_at
+                            ),
 
-                            if (
-                                column === "created_at" ||
-                                column === "printed_date"
-                            ) {
+                        qrcode:
+                            item.qrcode,
 
-                                row[column] =
-                                    malaysiaDate(
-                                        item[column]
-                                    )
+                        "Total_Upload Files":
+                            uploadFileCounts.get(
+                                item.id
+                            ) || 0,
 
-                            } else {
+                        status:
+                            item.status,
 
-                                row[column] =
-                                    item[column]
+                        printed_from:
+                            item.printed_from,
 
-                            }
+                        printed_date:
+                            malaysiaDate(
+                                item.printed_date
+                            ),
 
-                        })
+                        Total_Printed:
+                            printedFileCounts.get(
+                                item.id
+                            ) || 0
 
-
-                    // -------------------------------------------------
-                    // Total Upload Files
-                    //
-                    // ONLY comes from created_at query
-                    // -------------------------------------------------
-
-                    row.Total_Upload_Files =
-                        uploadFileCounts.get(
-                            item.id
-                        ) || 0
-
-
-                    // -------------------------------------------------
-                    // Total Printed
-                    //
-                    // ONLY comes from printed_date query
-                    // -------------------------------------------------
-
-                    row.Total_printed =
-                        printedFileCounts.get(
-                            item.id
-                        ) || 0
-
-
-                    return row
+                    }
 
                 })
 
