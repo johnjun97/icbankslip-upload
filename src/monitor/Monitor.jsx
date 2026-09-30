@@ -18,6 +18,9 @@ function Monitor() {
         checkingUser
     } = useMonitorAuth()
 
+    // console.log("[Monitor] user:", user)
+    // console.log("[Monitor] checkingUser:", checkingUser)
+
 
     // default time filter
     const [chartRange, setChartRange] = useState("today")

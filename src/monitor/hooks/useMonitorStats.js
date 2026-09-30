@@ -205,8 +205,13 @@ export default function useMonitorStats(
 
         const now = new Date()
 
-        let startDate = null
-        let endDate = null
+        let query = supabase
+            .from('submissions')
+            .select(`
+            ic_front_path,
+            ic_back_path,
+            bank_slip_paths
+        `)
 
 
         if (cardRange === "today") {
@@ -214,7 +219,10 @@ export default function useMonitorStats(
             const start = new Date()
             start.setHours(0, 0, 0, 0)
 
-            startDate = start.toISOString()
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
 
         }
 
@@ -228,10 +236,18 @@ export default function useMonitorStats(
             const end = new Date(start)
             end.setDate(end.getDate() + 1)
 
-            startDate = start.toISOString()
-            endDate = end.toISOString()
+            query = query
+                .gte(
+                    'created_at',
+                    start.toISOString()
+                )
+                .lt(
+                    'created_at',
+                    end.toISOString()
+                )
 
         }
+
 
         if (cardRange === "7days") {
 
@@ -240,8 +256,14 @@ export default function useMonitorStats(
                 now.getMonth(),
                 now.getDate() - 6
             )
-            startDate = start.toISOString()
+
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
+
         }
+
 
         if (cardRange === "thisweek") {
 
@@ -257,7 +279,10 @@ export default function useMonitorStats(
                 now.getDate() + mondayOffset
             )
 
-            startDate = start.toISOString()
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
 
         }
 
@@ -282,8 +307,15 @@ export default function useMonitorStats(
                 start.getDate() + 7
             )
 
-            startDate = start.toISOString()
-            endDate = end.toISOString()
+            query = query
+                .gte(
+                    'created_at',
+                    start.toISOString()
+                )
+                .lt(
+                    'created_at',
+                    end.toISOString()
+                )
 
         }
 
@@ -296,7 +328,10 @@ export default function useMonitorStats(
                 1
             )
 
-            startDate = start.toISOString()
+            query = query.gte(
+                'created_at',
+                start.toISOString()
+            )
 
         }
 
@@ -315,20 +350,20 @@ export default function useMonitorStats(
                 1
             )
 
-            startDate = start.toISOString()
-            endDate = end.toISOString()
+            query = query
+                .gte(
+                    'created_at',
+                    start.toISOString()
+                )
+                .lt(
+                    'created_at',
+                    end.toISOString()
+                )
 
         }
 
 
-        const { data, error } = await supabase
-            .rpc(
-                'count_upload_files',
-                {
-                    start_date: startDate,
-                    end_date: endDate
-                }
-            )
+        const { data, error } = await query
 
 
         if (error) {
@@ -344,7 +379,32 @@ export default function useMonitorStats(
         }
 
 
-        setTotalUploadFiles(data || 0)
+        let totalFiles = 0
+
+        data.forEach(item => {
+
+            // IC front
+            if (item.ic_front_path) {
+                totalFiles += 1
+            }
+
+            // IC back
+            if (item.ic_back_path) {
+                totalFiles += 1
+            }
+
+            // Bank slip files
+            if (Array.isArray(item.bank_slip_paths)) {
+
+                totalFiles +=
+                    item.bank_slip_paths.length
+
+            }
+
+        })
+
+
+        setTotalUploadFiles(totalFiles)
 
         setLoadingUploadFiles(false)
 
@@ -360,9 +420,6 @@ export default function useMonitorStats(
         let query = supabase
             .from('submissions')
             .select(`
-    ic_front_path,
-    ic_back_path,
-    bank_slip_paths,
     ic_copies,
     bank_slip_copies
 `)
@@ -551,39 +608,23 @@ export default function useMonitorStats(
 
         data.forEach(item => {
 
+            // IC copies
             const icCopies =
-                Number(item.ic_copies) >= 1
-                    ? Number(item.ic_copies)
-                    : 1
+                Number(item.ic_copies) || 0
 
-            // IC Front
-            if (item.ic_front_path) {
-                totalCopies += icCopies
-            }
+            totalCopies += icCopies
 
-            // IC Back
-            if (item.ic_back_path) {
-                totalCopies += icCopies
-            }
-
-            // Bank Slips
-            if (Array.isArray(item.bank_slip_paths)) {
+            // Bank slip copies
+            if (Array.isArray(item.bank_slip_copies)) {
 
                 const bankSlipCopies =
-                    Array.isArray(item.bank_slip_copies)
-                        ? item.bank_slip_copies
-                        : []
+                    item.bank_slip_copies.reduce(
+                        (sum, copies) =>
+                            sum + (Number(copies) || 0),
+                        0
+                    )
 
-                item.bank_slip_paths.forEach((_, index) => {
-
-                    const copies =
-                        Number(bankSlipCopies[index]) >= 1
-                            ? Number(bankSlipCopies[index])
-                            : 1
-
-                    totalCopies += copies
-
-                })
+                totalCopies += bankSlipCopies
             }
 
         })

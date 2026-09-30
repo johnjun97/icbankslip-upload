@@ -37,3 +37,7 @@ update version in package.json
 # [1.1.7] - 20260921
 
 - add dropdown for print copies
+
+# [1.1.8] - 20260930
+
+- add export button, fixed Total Upload Files , Total Printed Files calculation

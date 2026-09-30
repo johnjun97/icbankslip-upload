@@ -11,54 +11,127 @@ export default function useMonitorChart(
 
     const [chartData, setChartData] = useState([])
 
-    const getBankSlipCount = (item) => {
 
-        let count = 0
+    // =========================================================
+    // Bank Slip Upload File Count
+    // =========================================================
 
-        // Old format
-        if (item.bank_slip_path) {
-            count++
+    const getBankSlipUploadCount = (item) => {
+
+        let bankSlipPaths =
+            item.bank_slip_paths
+
+
+        if (typeof bankSlipPaths === "string") {
+
+            try {
+
+                bankSlipPaths =
+                    JSON.parse(
+                        bankSlipPaths
+                    )
+
+            } catch {
+
+                bankSlipPaths = []
+
+            }
+
         }
 
-        // New format
-        if (Array.isArray(item.bank_slip_paths)) {
-            count += item.bank_slip_paths.length
-        }
 
-        return count
+        return Array.isArray(bankSlipPaths)
+            ? bankSlipPaths.length
+            : 0
+
     }
+
+
+    // =========================================================
+    // Bank Slip Printed Copies
+    // =========================================================
+
+    const getBankSlipPrintedCopies = (item) => {
+
+        let bankSlipCopies =
+            item.bank_slip_copies
+
+
+        if (typeof bankSlipCopies === "string") {
+
+            try {
+
+                bankSlipCopies =
+                    JSON.parse(
+                        bankSlipCopies
+                    )
+
+            } catch {
+
+                bankSlipCopies = []
+
+            }
+
+        }
+
+
+        if (!Array.isArray(bankSlipCopies)) {
+            return 0
+        }
+
+
+        return bankSlipCopies.reduce(
+            (sum, copies) =>
+                sum +
+                (Number(copies) || 0),
+            0
+        )
+
+    }
+
 
     const loadChartData = async () => {
 
-        const { data, error } = await supabase
+        const {
+            data,
+            error
+        } = await supabase
             .from('submissions')
             .select(`
+                id,
                 created_at,
                 printed_date,
                 status,
                 printed_from,
                 ic_front_path,
                 ic_back_path,
-                bank_slip_path,
-                bank_slip_paths
+                bank_slip_paths,
+                ic_copies,
+                bank_slip_copies
             `)
 
+
         if (error) {
+
             debugError(
                 "Load chart data error:",
                 error
             )
+
             return
+
         }
+
 
         const now = new Date()
 
-        let startDate
-        let endDate
+        let startDate = null
+        let endDate = null
 
-        /*
-         * Determine date range
-         */
+
+        // =========================================================
+        // DATE RANGE
+        // =========================================================
 
         if (chartRange === "today") {
 
@@ -76,6 +149,7 @@ export default function useMonitorChart(
 
         }
 
+
         else if (chartRange === "yesterday") {
 
             startDate = new Date(
@@ -92,13 +166,18 @@ export default function useMonitorChart(
 
         }
 
+
         else if (chartRange === "thisweek") {
 
-            const day = now.getDay()
+            const day =
+                now.getDay()
 
-            const mondayOffset = day === 0
-                ? -6
-                : 1 - day
+
+            const mondayOffset =
+                day === 0
+                    ? -6
+                    : 1 - day
+
 
             startDate = new Date(
                 now.getFullYear(),
@@ -106,6 +185,7 @@ export default function useMonitorChart(
                 now.getDate() + mondayOffset
             )
 
+
             endDate = new Date(
                 startDate.getFullYear(),
                 startDate.getMonth(),
@@ -114,19 +194,27 @@ export default function useMonitorChart(
 
         }
 
+
         else if (chartRange === "lastweek") {
 
-            const day = now.getDay()
+            const day =
+                now.getDay()
 
-            const mondayOffset = day === 0
-                ? -6
-                : 1 - day
+
+            const mondayOffset =
+                day === 0
+                    ? -6
+                    : 1 - day
+
 
             startDate = new Date(
                 now.getFullYear(),
                 now.getMonth(),
-                now.getDate() + mondayOffset - 7
+                now.getDate() +
+                mondayOffset -
+                7
             )
+
 
             endDate = new Date(
                 startDate.getFullYear(),
@@ -135,6 +223,7 @@ export default function useMonitorChart(
             )
 
         }
+
 
         else if (chartRange === "7days") {
 
@@ -144,6 +233,7 @@ export default function useMonitorChart(
                 now.getDate() - 6
             )
 
+
             endDate = new Date(
                 now.getFullYear(),
                 now.getMonth(),
@@ -151,6 +241,7 @@ export default function useMonitorChart(
             )
 
         }
+
 
         else if (chartRange === "30days") {
 
@@ -160,6 +251,7 @@ export default function useMonitorChart(
                 now.getDate() - 29
             )
 
+
             endDate = new Date(
                 now.getFullYear(),
                 now.getMonth(),
@@ -167,6 +259,7 @@ export default function useMonitorChart(
             )
 
         }
+
 
         else if (chartRange === "month") {
 
@@ -176,6 +269,7 @@ export default function useMonitorChart(
                 1
             )
 
+
             endDate = new Date(
                 now.getFullYear(),
                 now.getMonth() + 1,
@@ -183,6 +277,7 @@ export default function useMonitorChart(
             )
 
         }
+
 
         else if (chartRange === "lastMonth") {
 
@@ -192,6 +287,7 @@ export default function useMonitorChart(
                 1
             )
 
+
             endDate = new Date(
                 now.getFullYear(),
                 now.getMonth(),
@@ -200,41 +296,42 @@ export default function useMonitorChart(
 
         }
 
-        /*
-         * All Time
-         */
 
-        else {
-
-            startDate = null
-            endDate = null
-
-        }
-
+        // =========================================================
+        // GROUPED DATA
+        // =========================================================
 
         const grouped = {}
 
 
-        /*
-         * Create empty dates
-         */
+        // =========================================================
+        // CREATE EMPTY DATE BUCKETS
+        // =========================================================
 
         if (startDate && endDate) {
 
             for (
                 let date = new Date(startDate);
                 date < endDate;
-                date.setDate(date.getDate() + 1)
+                date.setDate(
+                    date.getDate() + 1
+                )
             ) {
 
                 const dateString =
                     date.toLocaleDateString()
 
+
                 grouped[dateString] = {
+
                     date: dateString,
+
                     uploads: 0,
+
                     uploadFiles: 0,
+
                     printed: 0
+
                 }
 
             }
@@ -242,62 +339,112 @@ export default function useMonitorChart(
         }
 
 
-        /*
-         * Process submissions
-         */
+        // =========================================================
+        // PROCESS SUBMISSIONS
+        // =========================================================
 
         data.forEach(item => {
 
-            /*
-             * Upload statistics
-             */
 
-            const uploadDate =
-                new Date(item.created_at)
+            // =====================================================
+            // TOTAL UPLOADS
+            //
+            // Date = created_at
+            // No status filter
+            // =====================================================
 
-            const uploadInRange =
-                !startDate ||
-                (
-                    uploadDate >= startDate &&
-                    uploadDate < endDate
-                )
+            if (item.created_at) {
+
+                const uploadDate =
+                    new Date(
+                        item.created_at
+                    )
 
 
-            if (uploadInRange) {
+                const uploadInRange =
+                    !startDate ||
+                    (
+                        uploadDate >= startDate &&
+                        uploadDate < endDate
+                    )
 
-                const dateString =
-                    uploadDate.toLocaleDateString()
 
-                if (!grouped[dateString]) {
+                if (uploadInRange) {
 
-                    grouped[dateString] = {
-                        date: dateString,
-                        uploads: 0,
-                        uploadFiles: 0,
-                        printed: 0
+                    const dateString =
+                        uploadDate.toLocaleDateString()
+
+
+                    if (!grouped[dateString]) {
+
+                        grouped[dateString] = {
+
+                            date: dateString,
+
+                            uploads: 0,
+
+                            uploadFiles: 0,
+
+                            printed: 0
+
+                        }
+
                     }
 
+
+                    // ---------------------------------------------
+                    // Total Uploads
+                    // ---------------------------------------------
+
+                    grouped[dateString].uploads++
+
+
+                    // ---------------------------------------------
+                    // Total Upload Files
+                    //
+                    // ic_front_path = 1
+                    // ic_back_path  = 1
+                    // bank_slip_paths.length
+                    // ---------------------------------------------
+
+                    if (item.ic_front_path) {
+
+                        grouped[
+                            dateString
+                        ].uploadFiles++
+
+                    }
+
+
+                    if (item.ic_back_path) {
+
+                        grouped[
+                            dateString
+                        ].uploadFiles++
+
+                    }
+
+
+                    grouped[
+                        dateString
+                    ].uploadFiles +=
+                        getBankSlipUploadCount(item)
+
                 }
-
-                grouped[dateString].uploads++
-
-
-                if (item.ic_front_path) {
-                    grouped[dateString].uploadFiles++
-                }
-
-                if (item.ic_back_path) {
-                    grouped[dateString].uploadFiles++
-                }
-
-                grouped[dateString].uploadFiles += getBankSlipCount(item)
 
             }
 
 
-            /*
-             * Printed statistics
-             */
+            // =====================================================
+            // TOTAL PRINTED FILES
+            //
+            // Date = printed_date
+            // Status = Printed
+            // Source = printSource
+            //
+            // IC = ic_copies
+            // Bank Slip = sum(bank_slip_copies)
+            // =====================================================
 
             if (
                 item.status === "Printed" &&
@@ -305,7 +452,10 @@ export default function useMonitorChart(
             ) {
 
                 const printedDate =
-                    new Date(item.printed_date)
+                    new Date(
+                        item.printed_date
+                    )
+
 
                 const printedInRange =
                     !startDate ||
@@ -313,6 +463,7 @@ export default function useMonitorChart(
                         printedDate >= startDate &&
                         printedDate < endDate
                     )
+
 
                 const correctSource =
                     printSource === "all" ||
@@ -327,27 +478,48 @@ export default function useMonitorChart(
                     const dateString =
                         printedDate.toLocaleDateString()
 
+
                     if (!grouped[dateString]) {
 
                         grouped[dateString] = {
+
                             date: dateString,
+
                             uploads: 0,
+
                             uploadFiles: 0,
+
                             printed: 0
+
                         }
 
                     }
 
 
-                    if (item.ic_front_path) {
-                        grouped[dateString].printed++
-                    }
+                    // ---------------------------------------------
+                    // IC Printed Copies
+                    // ---------------------------------------------
 
-                    if (item.ic_back_path) {
-                        grouped[dateString].printed++
-                    }
+                    const icCopies =
+                        Number(
+                            item.ic_copies
+                        ) || 0
 
-                    grouped[dateString].printed += getBankSlipCount(item)
+
+                    grouped[
+                        dateString
+                    ].printed +=
+                        icCopies
+
+
+                    // ---------------------------------------------
+                    // Bank Slip Printed Copies
+                    // ---------------------------------------------
+
+                    grouped[
+                        dateString
+                    ].printed +=
+                        getBankSlipPrintedCopies(item)
 
                 }
 
@@ -356,25 +528,37 @@ export default function useMonitorChart(
         })
 
 
-        /*
-         * Sort by date
-         */
+        // =========================================================
+        // SORT BY DATE
+        // =========================================================
 
         const result =
-            Object.values(grouped).sort(
+            Object.values(
+                grouped
+            ).sort(
                 (a, b) =>
                     new Date(a.date) -
                     new Date(b.date)
             )
 
 
-        setChartData(result)
+        setChartData(
+            result
+        )
 
     }
 
+
+    // =========================================================
+    // LOAD
+    // =========================================================
+
     useEffect(() => {
 
-        if (!user) return
+        if (!user) {
+            return
+        }
+
 
         loadChartData()
 
@@ -385,7 +569,9 @@ export default function useMonitorChart(
         refreshTrigger
     ])
 
+
     return {
         chartData
     }
+
 }
