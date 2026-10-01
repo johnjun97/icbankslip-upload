@@ -699,7 +699,7 @@ function UploadPrintCard({
 
             XLSX.writeFile(
                 workbook,
-                `${exportDate} submissions-${sourceName}-${chartRange}.xlsx`
+                `${exportDate} ICBankSlipKiosk-${sourceName}-${chartRange}.xlsx`
             )
 
 
