@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@office-kit/xlsx": "^0.23.1",
     "@supabase/supabase-js": "^2.110.1",
     "pdfjs-dist": "^5.4.296",
     "qrcode.react": "^4.2.0",
