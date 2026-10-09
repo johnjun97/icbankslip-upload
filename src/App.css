@@ -1,3 +1,7 @@
+:root {
+  color-scheme: only light;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -305,11 +309,12 @@ button:disabled {
 }
 
 .qr-success h2 {
-  margin: 20px 0 10px;
+  margin: 24px 0 8px;
 }
 
-.qr-success p {
-  margin: 10px 0;
+.qr-success>p {
+  margin: 0;
+  line-height: 1.5;
 }
 
 .qr-success canvas {
@@ -341,6 +346,44 @@ button:disabled {
   color: #888;
   line-height: 1;
   white-space: nowrap;
+}
+
+.qr-code-save-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin: 20px 0 24px;
+}
+
+.qr-code-save-container p {
+  margin: 8px 0 16px;
+  font-size: 16px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.qr-code-save-container canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+}
+
+.qr-code-save-container button {
+  width: fit-content;
+  min-width: 150px;
+  padding: 0 20px;
+  margin: 0;
+}
+
+.upload-another-button {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0 20px;
+  margin: 0 auto;
 }
 
 /* Mobile */

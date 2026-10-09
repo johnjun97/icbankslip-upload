@@ -544,14 +544,67 @@ function App() {
             {t[language].scanQr}
           </p>
 
-          <QRCodeCanvas
-            value={qrCode}
-            size={250}
-          />
+          <div className="qr-code-save-container">
 
-          <p>{qrCode}</p>
+            <QRCodeCanvas
+              id="qr-code-canvas"
+              value={qrCode}
+              size={250}
+              bgColor="#FFFFFF"
+              fgColor="#000000"
+              marginSize={1}
+            />
+
+            <p>{qrCode}</p>
+
+
+            <button
+              type="button"
+              onClick={() => {
+                const qrCanvas = document.getElementById('qr-code-canvas')
+                if (!qrCanvas) return
+
+                const padding = 20
+                const textHeight = 40
+                const outputCanvas = document.createElement('canvas')
+                const ctx = outputCanvas.getContext('2d')
+
+                if (!ctx) return
+
+                outputCanvas.width = qrCanvas.width + padding * 2
+                outputCanvas.height = qrCanvas.height + padding * 2 + textHeight
+
+                // White background
+                ctx.fillStyle = '#FFFFFF'
+                ctx.fillRect(0, 0, outputCanvas.width, outputCanvas.height)
+
+                // Draw QR code
+                ctx.drawImage(qrCanvas, padding, padding)
+
+                // Draw reference text below QR code
+                ctx.fillStyle = '#000000'
+                ctx.font = 'bold 16px Arial'
+                ctx.textAlign = 'center'
+                ctx.textBaseline = 'middle'
+                ctx.fillText(
+                  qrCode,
+                  outputCanvas.width / 2,
+                  padding + qrCanvas.height + textHeight / 2
+                )
+
+                // Download image
+                const link = document.createElement('a')
+                link.download = `${qrCode}.png`
+                link.href = outputCanvas.toDataURL('image/png')
+                link.click()
+              }}
+            >
+              Save QR Code
+            </button>
+          </div>
 
           <button
+            className="upload-another-button"
             onClick={() => {
               setQrCode(null)
               if (files.icFront?.preview) {
