@@ -84,6 +84,7 @@ function App() {
       preparingUpload: "Preparing upload...",
       copy: "Copy",
       copies: "Copies",
+      saveQrCode: "Save QR Code",
     },
 
     zh: {
@@ -119,6 +120,7 @@ function App() {
       preparingUpload: "准备上传...",
       copy: "份",
       copies: "份",
+      saveQrCode: "保存二维码",
     }
   }
 
@@ -599,7 +601,7 @@ function App() {
                 link.click()
               }}
             >
-              Save QR Code
+              {t[language].saveQrCode}
             </button>
           </div>
 
