@@ -41,3 +41,8 @@ update version in package.json
 # [1.1.8] - 20260930
 
 - add export button, fixed Total Upload Files , Total Printed Files calculation
+
+# [1.1.9] - 20261009
+
+- added qr margin, save qr button
+- change monitor 'Total Printed Files' into 'Total Printed Pages'

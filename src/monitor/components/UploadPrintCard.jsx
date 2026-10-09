@@ -1281,7 +1281,7 @@ function UploadPrintCard({
                 ],
 
                 [
-                    "Total Printed Files",
+                    "Total Printed Pages",
                     totalPrintedFiles
                 ]
 
@@ -1390,7 +1390,7 @@ function UploadPrintCard({
                 "Date",
                 "Uploads",
                 "Upload Files",
-                "Printed Files"
+                "Printed Pages"
             ]
 
 
@@ -1589,7 +1589,7 @@ function UploadPrintCard({
 
                                 tx: {
                                     kind: "literal",
-                                    value: "Total Printed Files"
+                                    value: "Total Printed Pages"
                                 },
 
                                 cat: {
@@ -1886,7 +1886,7 @@ function UploadPrintCard({
                 <div className="upload-print-stat">
 
                     <div className="stat-label">
-                        Total Printed Files
+                        Total Printed Pages
                     </div>
 
                     <div className="stat-value">
@@ -2105,7 +2105,7 @@ function UploadPrintCard({
                                             }}
                                         />
 
-                                        Total Printed Files
+                                        Total Printed Pages
 
                                     </span>
 
@@ -2131,7 +2131,7 @@ function UploadPrintCard({
 
                         <Bar
                             dataKey="printed"
-                            name="Total Printed Files"
+                            name="Total Printed Pages"
                             fill="#ff7300"
                         />
 
