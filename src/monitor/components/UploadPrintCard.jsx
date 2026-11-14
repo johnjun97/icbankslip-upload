@@ -46,9 +46,11 @@ function UploadPrintCard({
     total,
     totalUploadFiles,
     printed,
+    printJob,
     loadingTotal,
     loadingUploadFiles,
     loadingPrinted,
+    loadingPrintJob,
     printSource,
     setPrintSource,
     printSources,
@@ -1864,6 +1866,22 @@ function UploadPrintCard({
 
                 </div>
 
+                <div className="upload-print-stat">
+
+                    <div className="stat-label">
+                        Print Job
+                    </div>
+
+                    <div className="stat-value">
+
+                        {loadingPrintJob
+                            ? "..."
+                            : printJob
+                        }
+
+                    </div>
+
+                </div>
 
                 <div className="upload-print-stat">
 

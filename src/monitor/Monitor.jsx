@@ -46,14 +46,16 @@ function Monitor() {
 
     }, [])
 
-    const {
-        total,
-        totalUploadFiles,
-        loadingUploadFiles,
-        printed,
-        loadingTotal,
-        loadingPrinted
-    } = useMonitorStats(
+const {
+    total,
+    totalUploadFiles,
+    loadingUploadFiles,
+    printed,
+    printJob,
+    loadingTotal,
+    loadingPrinted,
+    loadingPrintJob
+} = useMonitorStats(
         user,
         chartRange,
         printSource,
@@ -152,8 +154,10 @@ function Monitor() {
                 totalLog={totalLog}
             />
 
-            <UploadPrintCard
-                total={total}
+<UploadPrintCard
+    printJob={printJob}
+    loadingPrintJob={loadingPrintJob}
+    total={total}
                 totalUploadFiles={totalUploadFiles}
                 printed={printed}
                 loadingTotal={loadingTotal}

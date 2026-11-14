@@ -46,3 +46,7 @@ update version in package.json
 
 - added qr margin, save qr button
 - change monitor 'Total Printed Files' into 'Total Printed Pages'
+
+# [1.1.10] - 20261114
+
+- add Print job card in monitor page

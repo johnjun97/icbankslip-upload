@@ -13,6 +13,9 @@ export default function useMonitorStats(
     const [totalUploadFiles, setTotalUploadFiles] = useState(null)
     const [loadingUploadFiles, setLoadingUploadFiles] = useState(true)
     const [printed, setPrinted] = useState(null)
+    const [printJob, setPrintJob] = useState(null)
+    const [loadingPrintJob, setLoadingPrintJob] = useState(true)
+
     const [loadingTotal, setLoadingTotal] = useState(true)
     const [loadingPrinted, setLoadingPrinted] = useState(true)
 
@@ -414,15 +417,18 @@ export default function useMonitorStats(
     const loadPrinted = async () => {
 
         setLoadingPrinted(true)
+        setLoadingPrintJob(true)
 
         const now = new Date()
 
         let query = supabase
             .from('submissions')
             .select(`
-    ic_copies,
-    bank_slip_copies
-`)
+        ic_copies,
+        bank_slip_copies
+    `, {
+                count: 'exact'
+            })
             .eq(
                 'status',
                 'Printed'
@@ -588,7 +594,7 @@ export default function useMonitorStats(
         }
 
 
-        const { data, error } = await query
+        const { data, count, error } = await query
 
 
         if (error) {
@@ -599,7 +605,7 @@ export default function useMonitorStats(
             )
 
             setLoadingPrinted(false)
-
+            setLoadingPrintJob(false)
             return
         }
 
@@ -630,8 +636,9 @@ export default function useMonitorStats(
         })
 
         setPrinted(totalCopies)
-
+        setPrintJob(count || 0)
         setLoadingPrinted(false)
+        setLoadingPrintJob(false)
 
     }
 
@@ -657,8 +664,10 @@ export default function useMonitorStats(
         totalUploadFiles,
         loadingUploadFiles,
         printed,
+        printJob,
         loadingTotal,
-        loadingPrinted
+        loadingPrinted,
+        loadingPrintJob
     }
 
 }
