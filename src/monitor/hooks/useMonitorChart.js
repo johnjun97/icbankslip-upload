@@ -1,6 +1,8 @@
+
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { debugError } from '../../lib/debug'
+import { getDateRange, parseArray } from './monitorHelpers'
 
 export default function useMonitorChart(
     user,
@@ -8,560 +10,212 @@ export default function useMonitorChart(
     printSource,
     refreshTrigger
 ) {
-
     const [chartData, setChartData] = useState([])
 
-
-    // =========================================================
-    // Bank Slip Upload File Count
-    // =========================================================
-
-    const getBankSlipUploadCount = (item) => {
-
-        let bankSlipPaths =
-            item.bank_slip_paths
-
-
-        if (typeof bankSlipPaths === "string") {
-
-            try {
-
-                bankSlipPaths =
-                    JSON.parse(
-                        bankSlipPaths
-                    )
-
-            } catch {
-
-                bankSlipPaths = []
-
-            }
-
-        }
-
-
-        return Array.isArray(bankSlipPaths)
-            ? bankSlipPaths.length
-            : 0
-
-    }
-
-
-    // =========================================================
-    // Bank Slip Printed Copies
-    // =========================================================
-
-    const getBankSlipPrintedCopies = (item) => {
-
-        let bankSlipCopies =
-            item.bank_slip_copies
-
-
-        if (typeof bankSlipCopies === "string") {
-
-            try {
-
-                bankSlipCopies =
-                    JSON.parse(
-                        bankSlipCopies
-                    )
-
-            } catch {
-
-                bankSlipCopies = []
-
-            }
-
-        }
-
-
-        if (!Array.isArray(bankSlipCopies)) {
-            return 0
-        }
-
-
-        return bankSlipCopies.reduce(
-            (sum, copies) =>
-                sum +
-                (Number(copies) || 0),
-            0
-        )
-
-    }
-
-
     const loadChartData = async () => {
+        // Fetch all records using pagination
+        let allData = []
+        let from = 0
+        const pageSize = 1000
 
-        const {
-            data,
-            error
-        } = await supabase
-            .from('submissions')
-            .select(`
-                id,
-                created_at,
-                printed_date,
-                status,
-                printed_from,
-                ic_front_path,
-                ic_back_path,
-                bank_slip_paths,
-                ic_copies,
-                bank_slip_copies
-            `)
+        while (true) {
 
+            const { data, error } = await supabase
+                .from('submissions')
+                .select(`
+            id,
+            created_at,
+            printed_date,
+            status,
+            printed_from,
+            ic_front_path,
+            ic_back_path,
+            bank_slip_paths,
+            ic_copies,
+            bank_slip_copies
+        `)
+                .range(from, from + pageSize - 1)
 
-        if (error) {
+            if (error) {
+                debugError('Load chart data error:', error)
+                return
+            }
 
-            debugError(
-                "Load chart data error:",
-                error
-            )
+            allData = allData.concat(data || [])
 
-            return
+            if (!data || data.length < pageSize) {
+                break
+            }
 
+            from += pageSize
         }
 
-
-        const now = new Date()
-
-        let startDate = null
-        let endDate = null
+        const data = allData
 
 
-        // =========================================================
-        // DATE RANGE
-        // =========================================================
 
-        if (chartRange === "today") {
 
-            startDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate()
-            )
+        // Use the shared date range
+        const { start, end } = getDateRange(chartRange)
 
-            endDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + 1
-            )
+        // DEBUG: Compare chart records against date range
+        const uploadsInRange = (data || []).filter(item => {
+            if (!item.created_at) return false
 
+            const date = new Date(item.created_at)
+
+            return (!start || date >= start) &&
+                (!end || date < end)
+        })
+
+        const printedInRange = (data || []).filter(item => {
+            if (item.status !== 'Printed' || !item.printed_date) {
+                return false
+            }
+
+            const date = new Date(item.printed_date)
+
+            const inRange =
+                (!start || date >= start) &&
+                (!end || date < end)
+
+            const correctSource =
+                printSource === 'all' ||
+                item.printed_from === printSource
+
+            return inRange && correctSource
+        })
+
+        // Convert date into a local YYYY-MM-DD key
+        const getDateKey = (date) => {
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0')
+            const day = String(date.getDate()).padStart(2, '0')
+
+            return `${year}-${month}-${day}`
         }
 
-
-        else if (chartRange === "yesterday") {
-
-            startDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() - 1
-            )
-
-            endDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate()
-            )
-
+        const createBucket = (date) => {
+            return {
+                date: getDateKey(date),
+                uploads: 0,
+                uploadFiles: 0,
+                printed: 0
+            }
         }
-
-
-        else if (chartRange === "thisweek") {
-
-            const day =
-                now.getDay()
-
-
-            const mondayOffset =
-                day === 0
-                    ? -6
-                    : 1 - day
-
-
-            startDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + mondayOffset
-            )
-
-
-            endDate = new Date(
-                startDate.getFullYear(),
-                startDate.getMonth(),
-                startDate.getDate() + 7
-            )
-
-        }
-
-
-        else if (chartRange === "lastweek") {
-
-            const day =
-                now.getDay()
-
-
-            const mondayOffset =
-                day === 0
-                    ? -6
-                    : 1 - day
-
-
-            startDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() +
-                mondayOffset -
-                7
-            )
-
-
-            endDate = new Date(
-                startDate.getFullYear(),
-                startDate.getMonth(),
-                startDate.getDate() + 7
-            )
-
-        }
-
-
-        else if (chartRange === "7days") {
-
-            startDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() - 6
-            )
-
-
-            endDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + 1
-            )
-
-        }
-
-
-        else if (chartRange === "30days") {
-
-            startDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() - 29
-            )
-
-
-            endDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + 1
-            )
-
-        }
-
-
-        else if (chartRange === "month") {
-
-            startDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            )
-
-
-            endDate = new Date(
-                now.getFullYear(),
-                now.getMonth() + 1,
-                1
-            )
-
-        }
-
-
-        else if (chartRange === "lastMonth") {
-
-            startDate = new Date(
-                now.getFullYear(),
-                now.getMonth() - 1,
-                1
-            )
-
-
-            endDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            )
-
-        }
-
-
-        // =========================================================
-        // GROUPED DATA
-        // =========================================================
 
         const grouped = {}
 
-
-        // =========================================================
-        // CREATE EMPTY DATE BUCKETS
-        // =========================================================
-
-        if (startDate && endDate) {
-
+        // Create empty date buckets for selected ranges
+        if (start && end) {
             for (
-                let date = new Date(startDate);
-                date < endDate;
-                date.setDate(
-                    date.getDate() + 1
-                )
+                let date = new Date(start);
+                date < end;
+                date.setDate(date.getDate() + 1)
             ) {
-
-                const dateString =
-                    date.toLocaleDateString()
-
-
-                grouped[dateString] = {
-
-                    date: dateString,
-
-                    uploads: 0,
-
-                    uploadFiles: 0,
-
-                    printed: 0
-
-                }
-
+                const dateKey = getDateKey(date)
+                grouped[dateKey] = createBucket(date)
             }
-
         }
 
+        // Process submissions
+        ; (data || []).forEach(item => {
 
-        // =========================================================
-        // PROCESS SUBMISSIONS
-        // =========================================================
-
-        data.forEach(item => {
-
-
-            // =====================================================
+            // =========================================
             // TOTAL UPLOADS
-            //
-            // Date = created_at
-            // No status filter
-            // =====================================================
+            // Date: created_at
+            // =========================================
 
             if (item.created_at) {
-
-                const uploadDate =
-                    new Date(
-                        item.created_at
-                    )
-
+                const uploadDate = new Date(item.created_at)
 
                 const uploadInRange =
-                    !startDate ||
-                    (
-                        uploadDate >= startDate &&
-                        uploadDate < endDate
-                    )
-
+                    (!start || uploadDate >= start) &&
+                    (!end || uploadDate < end)
 
                 if (uploadInRange) {
+                    const dateKey = getDateKey(uploadDate)
 
-                    const dateString =
-                        uploadDate.toLocaleDateString()
-
-
-                    if (!grouped[dateString]) {
-
-                        grouped[dateString] = {
-
-                            date: dateString,
-
-                            uploads: 0,
-
-                            uploadFiles: 0,
-
-                            printed: 0
-
-                        }
-
+                    if (!grouped[dateKey]) {
+                        grouped[dateKey] = createBucket(uploadDate)
                     }
 
+                    grouped[dateKey].uploads++
 
-                    // ---------------------------------------------
-                    // Total Uploads
-                    // ---------------------------------------------
-
-                    grouped[dateString].uploads++
-
-
-                    // ---------------------------------------------
-                    // Total Upload Files
-                    //
-                    // ic_front_path = 1
-                    // ic_back_path  = 1
-                    // bank_slip_paths.length
-                    // ---------------------------------------------
-
+                    // IC front and back files
                     if (item.ic_front_path) {
-
-                        grouped[
-                            dateString
-                        ].uploadFiles++
-
+                        grouped[dateKey].uploadFiles++
                     }
-
 
                     if (item.ic_back_path) {
-
-                        grouped[
-                            dateString
-                        ].uploadFiles++
-
+                        grouped[dateKey].uploadFiles++
                     }
 
-
-                    grouped[
-                        dateString
-                    ].uploadFiles +=
-                        getBankSlipUploadCount(item)
-
+                    // Bank slip uploaded files
+                    grouped[dateKey].uploadFiles +=
+                        parseArray(item.bank_slip_paths).length
                 }
-
             }
 
-
-            // =====================================================
+            // =========================================
             // TOTAL PRINTED FILES
-            //
-            // Date = printed_date
-            // Status = Printed
-            // Source = printSource
-            //
-            // IC = ic_copies
-            // Bank Slip = sum(bank_slip_copies)
-            // =====================================================
+            // Date: printed_date
+            // Status: Printed
+            // Source: printSource
+            // =========================================
 
             if (
-                item.status === "Printed" &&
+                item.status === 'Printed' &&
                 item.printed_date
             ) {
-
-                const printedDate =
-                    new Date(
-                        item.printed_date
-                    )
-
+                const printedDate = new Date(item.printed_date)
 
                 const printedInRange =
-                    !startDate ||
-                    (
-                        printedDate >= startDate &&
-                        printedDate < endDate
-                    )
-
+                    (!start || printedDate >= start) &&
+                    (!end || printedDate < end)
 
                 const correctSource =
-                    printSource === "all" ||
+                    printSource === 'all' ||
                     item.printed_from === printSource
 
+                if (printedInRange && correctSource) {
+                    const dateKey = getDateKey(printedDate)
 
-                if (
-                    printedInRange &&
-                    correctSource
-                ) {
-
-                    const dateString =
-                        printedDate.toLocaleDateString()
-
-
-                    if (!grouped[dateString]) {
-
-                        grouped[dateString] = {
-
-                            date: dateString,
-
-                            uploads: 0,
-
-                            uploadFiles: 0,
-
-                            printed: 0
-
-                        }
-
+                    if (!grouped[dateKey]) {
+                        grouped[dateKey] = createBucket(printedDate)
                     }
 
+                    // IC printed copies
+                    grouped[dateKey].printed +=
+                        Number(item.ic_copies) || 0
 
-                    // ---------------------------------------------
-                    // IC Printed Copies
-                    // ---------------------------------------------
-
-                    const icCopies =
-                        Number(
-                            item.ic_copies
-                        ) || 0
-
-
-                    grouped[
-                        dateString
-                    ].printed +=
-                        icCopies
-
-
-                    // ---------------------------------------------
-                    // Bank Slip Printed Copies
-                    // ---------------------------------------------
-
-                    grouped[
-                        dateString
-                    ].printed +=
-                        getBankSlipPrintedCopies(item)
-
+                    // Bank slip printed copies
+                    grouped[dateKey].printed +=
+                        parseArray(item.bank_slip_copies).reduce(
+                            (sum, copies) =>
+                                sum + (Number(copies) || 0),
+                            0
+                        )
                 }
-
             }
-
         })
 
-
-        // =========================================================
-        // SORT BY DATE
-        // =========================================================
-
-        const result =
-            Object.values(
-                grouped
-            ).sort(
-                (a, b) =>
-                    new Date(a.date) -
-                    new Date(b.date)
+        // Sort dates chronologically
+        const result = Object.entries(grouped)
+            .sort(([dateA], [dateB]) =>
+                dateA.localeCompare(dateB)
             )
+            .map(([, value]) => value)
 
-
-        setChartData(
-            result
-        )
-
+        setChartData(result)
     }
 
-
-    // =========================================================
-    // LOAD
-    // =========================================================
-
     useEffect(() => {
-
         if (!user) {
             return
         }
 
-
         loadChartData()
-
     }, [
         user,
         chartRange,
@@ -569,9 +223,7 @@ export default function useMonitorChart(
         refreshTrigger
     ])
 
-
     return {
         chartData
     }
-
 }

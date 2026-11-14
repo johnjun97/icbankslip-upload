@@ -1,3 +1,4 @@
+import { getDateRange } from '../hooks/monitorHelpers'
 import {
     BarChart,
     Bar,
@@ -68,10 +69,10 @@ function UploadPrintCard({
             // DATE RANGE
             // =========================================================
 
-            const now = new Date()
+            const { start, end } = getDateRange(chartRange)
 
-            let startDate = null
-            let endDate = null
+            const startDate = start
+            const endDate = end
 
 
             if (chartRange === "today") {
@@ -1952,10 +1953,10 @@ function UploadPrintCard({
                                 payload
                             }) => {
 
-                                const date =
-                                    new Date(
-                                        payload.value
-                                    )
+                                const [year, month, day] =
+                                    payload.value.split('-').map(Number)
+
+                                const date = new Date(year, month - 1, day)
 
 
                                 const dateText =

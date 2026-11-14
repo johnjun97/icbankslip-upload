@@ -1,6 +1,11 @@
+
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { debugError } from '../../lib/debug'
+import {
+    applyDateRange,
+    parseArray
+} from './monitorHelpers'
 
 export default function useMonitorStats(
     user,
@@ -20,11 +25,13 @@ export default function useMonitorStats(
     const [loadingPrinted, setLoadingPrinted] = useState(true)
 
 
+    // =========================================================
+    // TOTAL UPLOADS
+    // =========================================================
+
     const loadTotalUploads = async () => {
 
         setLoadingTotal(true)
-
-        const now = new Date()
 
         let query = supabase
             .from('submissions')
@@ -33,152 +40,11 @@ export default function useMonitorStats(
                 head: true
             })
 
-
-        if (cardRange === "today") {
-
-            const start = new Date()
-            start.setHours(0, 0, 0, 0)
-
-            query = query.gte(
-                'created_at',
-                start.toISOString()
-            )
-
-        }
-
-
-        if (cardRange === "yesterday") {
-
-            const start = new Date()
-            start.setDate(start.getDate() - 1)
-            start.setHours(0, 0, 0, 0)
-
-            const end = new Date(start)
-            end.setDate(end.getDate() + 1)
-
-            query = query
-                .gte(
-                    'created_at',
-                    start.toISOString()
-                )
-                .lt(
-                    'created_at',
-                    end.toISOString()
-                )
-        }
-
-        if (cardRange === "7days") {
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() - 6
-            )
-
-            query = query
-                .gte(
-                    'created_at',
-                    start.toISOString()
-                )
-        }
-
-        if (cardRange === "thisweek") {
-
-            const day = now.getDay()
-
-            const mondayOffset = day === 0
-                ? -6
-                : 1 - day
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + mondayOffset
-            )
-
-            query = query.gte(
-                'created_at',
-                start.toISOString()
-            )
-
-        }
-
-
-        if (cardRange === "lastweek") {
-
-            const day = now.getDay()
-
-            const mondayOffset = day === 0
-                ? -6
-                : 1 - day
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + mondayOffset - 7
-            )
-
-            const end = new Date(
-                start.getFullYear(),
-                start.getMonth(),
-                start.getDate() + 7
-            )
-
-            query = query
-                .gte(
-                    'created_at',
-                    start.toISOString()
-                )
-                .lt(
-                    'created_at',
-                    end.toISOString()
-                )
-
-        }
-
-
-        if (cardRange === "month") {
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            )
-
-            query = query.gte(
-                'created_at',
-                start.toISOString()
-            )
-
-        }
-
-
-        if (cardRange === "lastMonth") {
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth() - 1,
-                1
-            )
-
-            const end = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            )
-
-            query = query
-                .gte(
-                    'created_at',
-                    start.toISOString()
-                )
-                .lt(
-                    'created_at',
-                    end.toISOString()
-                )
-
-        }
-
+        query = applyDateRange(
+            query,
+            'created_at',
+            cardRange
+        )
 
         const { count, error } = await query
 
@@ -190,184 +56,38 @@ export default function useMonitorStats(
             )
 
             setLoadingTotal(false)
-
             return
         }
 
-
         setTotal(count || 0)
-
         setLoadingTotal(false)
 
     }
 
 
+    // =========================================================
+    // TOTAL UPLOAD FILES
+    // =========================================================
+
     const loadTotalUploadFiles = async () => {
 
         setLoadingUploadFiles(true)
 
-        const now = new Date()
-
         let query = supabase
             .from('submissions')
             .select(`
-            ic_front_path,
-            ic_back_path,
-            bank_slip_paths
-        `)
+                ic_front_path,
+                ic_back_path,
+                bank_slip_paths
+            `)
 
-
-        if (cardRange === "today") {
-
-            const start = new Date()
-            start.setHours(0, 0, 0, 0)
-
-            query = query.gte(
-                'created_at',
-                start.toISOString()
-            )
-
-        }
-
-
-        if (cardRange === "yesterday") {
-
-            const start = new Date()
-            start.setDate(start.getDate() - 1)
-            start.setHours(0, 0, 0, 0)
-
-            const end = new Date(start)
-            end.setDate(end.getDate() + 1)
-
-            query = query
-                .gte(
-                    'created_at',
-                    start.toISOString()
-                )
-                .lt(
-                    'created_at',
-                    end.toISOString()
-                )
-
-        }
-
-
-        if (cardRange === "7days") {
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() - 6
-            )
-
-            query = query.gte(
-                'created_at',
-                start.toISOString()
-            )
-
-        }
-
-
-        if (cardRange === "thisweek") {
-
-            const day = now.getDay()
-
-            const mondayOffset = day === 0
-                ? -6
-                : 1 - day
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + mondayOffset
-            )
-
-            query = query.gte(
-                'created_at',
-                start.toISOString()
-            )
-
-        }
-
-
-        if (cardRange === "lastweek") {
-
-            const day = now.getDay()
-
-            const mondayOffset = day === 0
-                ? -6
-                : 1 - day
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + mondayOffset - 7
-            )
-
-            const end = new Date(
-                start.getFullYear(),
-                start.getMonth(),
-                start.getDate() + 7
-            )
-
-            query = query
-                .gte(
-                    'created_at',
-                    start.toISOString()
-                )
-                .lt(
-                    'created_at',
-                    end.toISOString()
-                )
-
-        }
-
-
-        if (cardRange === "month") {
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            )
-
-            query = query.gte(
-                'created_at',
-                start.toISOString()
-            )
-
-        }
-
-
-        if (cardRange === "lastMonth") {
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth() - 1,
-                1
-            )
-
-            const end = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            )
-
-            query = query
-                .gte(
-                    'created_at',
-                    start.toISOString()
-                )
-                .lt(
-                    'created_at',
-                    end.toISOString()
-                )
-
-        }
-
+        query = applyDateRange(
+            query,
+            'created_at',
+            cardRange
+        )
 
         const { data, error } = await query
-
 
         if (error) {
 
@@ -377,10 +97,8 @@ export default function useMonitorStats(
             )
 
             setLoadingUploadFiles(false)
-
             return
         }
-
 
         let totalFiles = 0
 
@@ -397,36 +115,33 @@ export default function useMonitorStats(
             }
 
             // Bank slip files
-            if (Array.isArray(item.bank_slip_paths)) {
-
-                totalFiles +=
-                    item.bank_slip_paths.length
-
-            }
+            totalFiles += parseArray(
+                item.bank_slip_paths
+            ).length
 
         })
 
-
         setTotalUploadFiles(totalFiles)
-
         setLoadingUploadFiles(false)
 
     }
 
+
+    // =========================================================
+    // PRINTED PAGES & PRINT JOBS
+    // =========================================================
 
     const loadPrinted = async () => {
 
         setLoadingPrinted(true)
         setLoadingPrintJob(true)
 
-        const now = new Date()
-
         let query = supabase
             .from('submissions')
             .select(`
-        ic_copies,
-        bank_slip_copies
-    `, {
+                ic_copies,
+                bank_slip_copies
+            `, {
                 count: 'exact'
             })
             .eq(
@@ -434,7 +149,7 @@ export default function useMonitorStats(
                 'Printed'
             )
 
-
+        // Print source filter
         if (cardPrintSource !== "all") {
 
             query = query.eq(
@@ -444,158 +159,14 @@ export default function useMonitorStats(
 
         }
 
-
-        if (cardRange === "today") {
-
-            const start = new Date()
-            start.setHours(0, 0, 0, 0)
-
-            query = query.gte(
-                'printed_date',
-                start.toISOString()
-            )
-
-        }
-
-
-        if (cardRange === "yesterday") {
-
-            const start = new Date()
-            start.setDate(start.getDate() - 1)
-            start.setHours(0, 0, 0, 0)
-
-            const end = new Date(start)
-            end.setDate(end.getDate() + 1)
-
-            query = query
-                .gte(
-                    'printed_date',
-                    start.toISOString()
-                )
-                .lt(
-                    'printed_date',
-                    end.toISOString()
-                )
-
-        }
-
-        if (cardRange === "7days") {
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() - 6
-            )
-
-            query = query
-                .gte(
-                    'printed_date',
-                    start.toISOString()
-                )
-
-        }
-
-
-        if (cardRange === "thisweek") {
-
-            const day = now.getDay()
-
-            const mondayOffset = day === 0
-                ? -6
-                : 1 - day
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + mondayOffset
-            )
-
-            query = query.gte(
-                'printed_date',
-                start.toISOString()
-            )
-
-        }
-
-
-        if (cardRange === "lastweek") {
-
-            const day = now.getDay()
-
-            const mondayOffset = day === 0
-                ? -6
-                : 1 - day
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + mondayOffset - 7
-            )
-
-            const end = new Date(
-                start.getFullYear(),
-                start.getMonth(),
-                start.getDate() + 7
-            )
-
-            query = query
-                .gte(
-                    'printed_date',
-                    start.toISOString()
-                )
-                .lt(
-                    'printed_date',
-                    end.toISOString()
-                )
-
-        }
-
-
-        if (cardRange === "month") {
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            )
-
-            query = query.gte(
-                'printed_date',
-                start.toISOString()
-            )
-
-        }
-
-
-        if (cardRange === "lastMonth") {
-
-            const start = new Date(
-                now.getFullYear(),
-                now.getMonth() - 1,
-                1
-            )
-
-            const end = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            )
-
-            query = query
-                .gte(
-                    'printed_date',
-                    start.toISOString()
-                )
-                .lt(
-                    'printed_date',
-                    end.toISOString()
-                )
-
-        }
-
+        // Date range filter
+        query = applyDateRange(
+            query,
+            'printed_date',
+            cardRange
+        )
 
         const { data, count, error } = await query
-
 
         if (error) {
 
@@ -609,7 +180,6 @@ export default function useMonitorStats(
             return
         }
 
-
         let totalCopies = 0
 
         data.forEach(item => {
@@ -621,27 +191,30 @@ export default function useMonitorStats(
             totalCopies += icCopies
 
             // Bank slip copies
-            if (Array.isArray(item.bank_slip_copies)) {
+            const bankSlipCopies = parseArray(
+                item.bank_slip_copies
+            )
 
-                const bankSlipCopies =
-                    item.bank_slip_copies.reduce(
-                        (sum, copies) =>
-                            sum + (Number(copies) || 0),
-                        0
-                    )
-
-                totalCopies += bankSlipCopies
-            }
+            totalCopies += bankSlipCopies.reduce(
+                (sum, copies) =>
+                    sum + (Number(copies) || 0),
+                0
+            )
 
         })
 
         setPrinted(totalCopies)
         setPrintJob(count || 0)
+
         setLoadingPrinted(false)
         setLoadingPrintJob(false)
 
     }
 
+
+    // =========================================================
+    // LOAD DATA
+    // =========================================================
 
     useEffect(() => {
 
@@ -658,6 +231,10 @@ export default function useMonitorStats(
         refreshTrigger
     ])
 
+
+    // =========================================================
+    // RETURN
+    // =========================================================
 
     return {
         total,
