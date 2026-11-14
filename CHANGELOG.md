@@ -54,3 +54,7 @@ update version in package.json
 # [1.1.11] - 20261114
 
 - Fix inconsistent Monitor chart data caused by Supabase 1,000-row fetch limit
+
+# [1.1.12] - 20261114
+
+- fixed vercel push issue, fix date range variables in export function

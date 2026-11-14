@@ -71,8 +71,10 @@ function UploadPrintCard({
 
             const { start, end } = getDateRange(chartRange)
 
-            const startDate = start
-            const endDate = end
+            let startDate = start
+            let endDate = end
+
+            const now = new Date()
 
 
             if (chartRange === "today") {
